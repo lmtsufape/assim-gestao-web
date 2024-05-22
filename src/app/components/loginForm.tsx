@@ -58,12 +58,12 @@ export const LoginForm = () => {
           />
         </div>
         <div className={S.links}>
-          <Link href="/">Esqueceu a senha?</Link>
+          <Link href="/recuperar-senha">Esqueceu a senha?</Link>
         </div>
         <Button
           dataType="filled"
           type="submit"
-          style={{ backgroundColor: '#f5821fe5', color: '#fff' }}
+          style={{ backgroundColor: '#008000', color: '#fff' }}
         >
           Entrar
         </Button>

@@ -3,14 +3,9 @@
 
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import React, { useState } from 'react';
-import {
-  BiSolidTrashAlt,
-  BiSolidEditAlt,
-  BiSolidFileImport,
-} from 'react-icons/bi';
-import { BsFillEyeFill, BsInfoCircle } from 'react-icons/bs';
-import { MdAttachFile } from 'react-icons/md';
+import React from 'react';
+import { BiSolidTrashAlt, BiSolidEditAlt } from 'react-icons/bi';
+import { BsInfoCircle } from 'react-icons/bs';
 
 import S from './styles.module.scss';
 
@@ -19,11 +14,11 @@ import StyledLink from '@/components/Link';
 import Loader from '@/components/Loader';
 import TableView from '@/components/Table/Table';
 
-import { getAllReunioes, removeReuniao } from '@/services';
+import { getAllCidades, removeCidade } from '@/services/cidades';
 import { Box, IconButton, Tooltip, Modal, Typography } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { AtaForm } from '@/components/Ata';
-import { AnexosForm } from '@/components/Anexos';
+import { Estado } from '@/types/api';
+import { FaTreeCity } from 'react-icons/fa6';
 
 const style = {
   position: 'absolute' as const,
@@ -38,58 +33,70 @@ const style = {
   p: 4,
 };
 
-export default function Home() {
-  const [modalId, setModalId] = useState<number | null>(null);
-  const [modalType, setModalType] = useState<string>('');
+export default function Cidades() {
   const [value, setValue] = React.useState(0);
-  const [token, setToken] = React.useState('');
   const handleClose = () => setValue(0);
+  const [token, setToken] = React.useState('');
   const [infoModalOpen, setInfoModalOpen] = React.useState(false);
 
   React.useEffect(() => {
     const token = localStorage.getItem('@token');
+    const rolesString = localStorage.getItem('@roles');
+    const roles = rolesString ? JSON.parse(rolesString) : '';
+    const filter = roles.map((item: { id: number }) => item.id);
     if (!token) {
       redirect('/');
+    }
+    if (filter.includes(5) || filter.includes(4)) {
+      redirect('/default');
     }
     setToken(token);
   }, []);
 
-  const handleOpenModal = (id: number, type: string) => {
-    setModalId(id);
-    setModalType(type);
-  };
+  const mutation = useMutation({
+    mutationFn: ({ token, value }: { token: string; value: number }) => {
+      return removeCidade(token, value);
+    },
+    onSuccess: () => {
+      refetch();
+      handleClose();
+    },
+  });
 
-  const handleCloseModal = () => {
-    setModalId(null);
-    setModalType('');
-  };
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ['cidades'],
+    queryFn: () => {
+      const token = localStorage.getItem('@token');
+      if (token) {
+        return getAllCidades(token);
+      }
+      return null;
+    },
+  });
 
+  if (isLoading) return <Loader />;
+  if (isError) return `Error: ${error.message}`;
   const handleOpenInfoModal = () => setInfoModalOpen(true);
   const handleCloseInfoModal = () => setInfoModalOpen(false);
 
   const columns: any = [
     {
-      header: 'Título',
-      accessorKey: 'titulo',
+      header: 'Nome',
+      accessorKey: 'nome',
     },
     {
-      header: 'Status',
-      accessorKey: 'status',
-    },
-    {
-      header: 'Tipo',
-      accessorKey: 'tipo',
+      header: 'Estado',
+      accessorKey: 'estado',
       cell: (info: any) => {
-        const value = info.getValue();
-        const formattedType = formatType(value);
-        return <span>{formattedType}</span>;
+        const value: Estado = info.getValue();
+        return <p>{value?.nome}</p>;
       },
     },
     {
       header: () => (
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           Ações
-          <Tooltip title="Clique nos ícones para visualizar, editar ou remover">
+          <Tooltip title="Clique aqui para informações sobre os ícones">
             <IconButton
               size="small"
               style={{ marginLeft: '5px', color: 'white' }}
@@ -106,38 +113,16 @@ export default function Home() {
         return (
           <ul className={S.action} role="list">
             <li>
-              <Tooltip title="Adicionar Ata">
-                <IconButton
-                  onClick={() => handleOpenModal(value, 'ata')}
-                  aria-label="Adicionar ata"
-                  size="small"
-                >
-                  <MdAttachFile />
-                </IconButton>
-              </Tooltip>
-            </li>
-            <li>
-              <Tooltip title="Adicionar Anexos">
-                <IconButton
-                  onClick={() => handleOpenModal(value, 'anexos')}
-                  aria-label="Adicionar anexos"
-                  size="small"
-                >
-                  <BiSolidFileImport />
-                </IconButton>
-              </Tooltip>
-            </li>
-            <li>
-              <Link href={'reunioes/' + value}>
-                <Tooltip title="Visualizar">
-                  <IconButton aria-label="visualizar" size="small">
-                    <BsFillEyeFill />
+              <Link href={`cidades/bairros/${value}`}>
+                <Tooltip title="Ver Bairros">
+                  <IconButton aria-label="bairros" size="small">
+                    <FaTreeCity />
                   </IconButton>
                 </Tooltip>
               </Link>
             </li>
             <li>
-              <Link href={'reunioes/editar/' + value}>
+              <Link href={'cidades/editar/' + value}>
                 <Tooltip title="Editar">
                   <IconButton aria-label="editar" size="small">
                     <BiSolidEditAlt />
@@ -162,43 +147,6 @@ export default function Home() {
     },
   ];
 
-  const formatType = (type: string) => {
-    switch (type) {
-      case 'ordinaria':
-        return 'Ordinária';
-      case 'extraordinaria':
-        return 'Extraordinária';
-      case 'multirao':
-        return 'Mutirão';
-      default:
-        return type;
-    }
-  };
-
-  const { data, isLoading, refetch, isError, error } = useQuery({
-    queryKey: ['reunioes'],
-    queryFn: () => {
-      const token = localStorage.getItem('@token');
-      if (token) {
-        return getAllReunioes(token);
-      }
-      return null;
-    },
-  });
-
-  const mutation = useMutation({
-    mutationFn: ({ token, value }: { token: string; value: number }) => {
-      return removeReuniao(token, value);
-    },
-    onSuccess: () => {
-      refetch();
-      handleClose();
-    },
-  });
-
-  if (isLoading) return <Loader />;
-  if (isError) return `Error: ${error.message}`;
-
   return (
     <div style={{ marginTop: '5rem' }}>
       <section className={S.dashboard}>
@@ -210,18 +158,18 @@ export default function Home() {
               </Link>
             </div>
             <div>
-              <h1 className={S.title}>Reuniões</h1>
+              <h1 className={S.title}>Cidades</h1>
             </div>
             <div className={S.addButton}>
               <StyledLink
-                href="reunioes/cadastrar"
+                href="cidades/cadastrar"
                 data-type="filled"
-                text="Criar Reunião"
+                text="Adicionar Nova Cidade"
               />
             </div>
           </div>
         </div>
-        <TableView columns={columns} data={data?.reunioes} />
+        <TableView columns={columns} data={data} />
       </section>
       <div>
         <Modal
@@ -252,24 +200,6 @@ export default function Home() {
             </div>
           </Box>
         </Modal>
-        <div style={{ marginTop: '5rem' }}>
-          <Modal
-            open={modalType === 'ata' && modalId !== null}
-            onClose={handleCloseModal}
-          >
-            <Box sx={style}>
-              {modalId !== null && <AtaForm reuniaoId={modalId} />}
-            </Box>
-          </Modal>
-          <Modal
-            open={modalType === 'anexos' && modalId !== null}
-            onClose={handleCloseModal}
-          >
-            <Box sx={style}>
-              {modalId !== null && <AnexosForm reuniaoId={modalId} />}
-            </Box>
-          </Modal>
-        </div>
         <Modal
           open={infoModalOpen}
           onClose={handleCloseInfoModal}
@@ -283,39 +213,24 @@ export default function Home() {
             <Typography id="info-modal-description" sx={{ mt: 2 }}>
               <ul>
                 <li>
-                  <BsFillEyeFill
+                  <FaTreeCity
                     style={{ verticalAlign: 'middle', marginRight: '5px' }}
                   />
-                  <strong>Visualizar:</strong> Abre uma página de detalhes da
-                  associação.
+                  <strong>Visualizar:</strong> Abre uma página de listagem dos
+                  bairros dessa cidade.
                 </li>
                 <li>
                   <BiSolidEditAlt
                     style={{ verticalAlign: 'middle', marginRight: '5px' }}
                   />
                   <strong>Editar:</strong> Permite modificar informações da
-                  associação.
+                  cidade.
                 </li>
                 <li>
                   <BiSolidTrashAlt
                     style={{ verticalAlign: 'middle', marginRight: '5px' }}
                   />
-                  <strong>Remover:</strong> Exclui a associação após
-                  confirmação.
-                </li>
-                <li>
-                  <MdAttachFile
-                    style={{ verticalAlign: 'middle', marginRight: '5px' }}
-                  />
-                  <strong>Anexar Ata:</strong> Permite enexar um arquivo de ata
-                  a reunião.
-                </li>
-                <li>
-                  <BiSolidFileImport
-                    style={{ verticalAlign: 'middle', marginRight: '5px' }}
-                  />
-                  <strong>Anexar Documentos:</strong> Permite anexar arquivos a
-                  reunião.
+                  <strong>Remover:</strong> Exclui a cidade após confirmação.
                 </li>
               </ul>
               <br />

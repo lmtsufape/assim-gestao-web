@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import React from 'react';
-import { FaBuildingUser } from 'react-icons/fa6';
+import { FaBuildingUser, FaCity } from 'react-icons/fa6';
 import { GrSchedules } from 'react-icons/gr';
 import { HiUsers } from 'react-icons/hi';
 import { TbHomeSearch } from 'react-icons/tb';
+import { PiStorefrontLight } from 'react-icons/pi';
 
 import S from './styles.module.scss';
 
@@ -43,6 +44,18 @@ const MenuOptions = () => {
       name: 'Reuniões',
       route: '/reunioes',
       roles: ['administrador', 'secretario', 'presidente'],
+    },
+    {
+      icon: <FaCity />,
+      name: 'Cidades',
+      route: '/cidades',
+      roles: ['administrador', 'presidente'],
+    },
+    {
+      icon: <PiStorefrontLight />,
+      name: 'Bancas',
+      route: '/bancas',
+      roles: ['administrador', 'presidente'],
     },
     {
       icon: <HiUsers />,

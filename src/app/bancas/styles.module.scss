@@ -1,0 +1,56 @@
+.dashboard {
+    max-width: 1280px;
+    padding: 1.5rem 1rem;
+    margin: 0 auto;
+  }
+  
+  .section {
+    input {
+      margin-bottom: 2rem;
+    }
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    margin-block: 2rem;
+    row-gap: 1rem;
+    flex-wrap: wrap;
+    width: 50%;
+  }
+   
+  .action {
+    display: flex;
+    gap: 1rem;
+    place-content: center;
+  }
+  
+  .buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    place-content: end;
+  }
+  
+  .title {
+    color: #005247;
+    font-weight: bold; 
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .link{
+    text-decoration: none;
+    appearance: none;
+    color:#005247;
+  }
+  
+  .back{
+    width: 25%;
+  }
+  
+  .addButton{
+    width: 25%;
+    display: flex;
+    justify-content: flex-end
+  }
