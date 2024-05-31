@@ -101,8 +101,6 @@ export default function Home() {
         associacao_id: 1,
       };
 
-      console.log('Request Body:', requestBody); // Adicionando log para verificar o corpo da requisição
-
       await createReuniao(requestBody, token);
       router.back();
     } catch (error: any) {
