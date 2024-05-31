@@ -11,7 +11,7 @@ export default function Home() {
     <main className={S.main}>
       <Container className={S.container}>
         <div className={S.leftContent}>
-          <h1>Gestão-Assim</h1>
+          <h1>Gestão-ASSIM</h1>
           <p>
             O sistema Gestão foi desenvolvido pela Universidade Federal do
             Agreste de Pernambuco (UFAPE) em resposta à demanda da Associação de

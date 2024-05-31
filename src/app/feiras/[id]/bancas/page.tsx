@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { redirect, useSearchParams } from 'next/navigation';
 import React from 'react';
 import { BsFillEyeFill, BsInfoCircle } from 'react-icons/bs';
 
@@ -12,8 +12,18 @@ import Button from '@/components/Button';
 import Loader from '@/components/Loader';
 import TableView from '@/components/Table/Table';
 
-import { getBancas, deleteBanca } from '@/services/banca';
-import { Box, IconButton, Tooltip, Modal, Typography } from '@mui/material';
+import { deleteBanca } from '@/services/banca';
+import { getBancasByFeira } from '@/services/feiras';
+import {
+  Box,
+  IconButton,
+  Tooltip,
+  Modal,
+  Typography,
+  Snackbar,
+  Alert,
+  AlertTitle,
+} from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 const style = {
@@ -34,6 +44,10 @@ export default function Bancas() {
   const handleClose = () => setBancaId(null);
   const [token, setToken] = React.useState('');
   const [infoModalOpen, setInfoModalOpen] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
+
+  const searchParams = useSearchParams();
+  const feiraId = searchParams.get('feiraId');
 
   React.useEffect(() => {
     const token = localStorage.getItem('@token');
@@ -51,17 +65,20 @@ export default function Bancas() {
       refetch();
       handleClose();
     },
+    onError: (error: any) => {
+      setErrorMessage(error.message);
+    },
   });
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['bancas'],
     queryFn: () => {
-      const token = localStorage.getItem('@token');
-      if (token) {
-        return getBancas(token);
+      if (token && feiraId) {
+        return getBancasByFeira(token, parseInt(feiraId));
       }
       return null;
     },
+    enabled: !!token && !!feiraId,
   });
 
   if (isLoading) return <Loader />;
@@ -126,7 +143,11 @@ export default function Bancas() {
             <h1 className={S.title}>Bancas</h1>
           </div>
         </div>
-        <TableView columns={columns} data={data} />
+        {data && data.bancas ? (
+          <TableView columns={columns} data={data.bancas} />
+        ) : (
+          <p>Nenhuma banca encontrada</p>
+        )}
       </section>
       <Modal
         open={bancaId !== null}
@@ -185,6 +206,20 @@ export default function Bancas() {
           </Button>
         </Box>
       </Modal>
+      <Snackbar
+        open={errorMessage.length > 0}
+        autoHideDuration={6000}
+        onClose={() => setErrorMessage('')}
+      >
+        <Alert
+          onClose={() => setErrorMessage('')}
+          severity="error"
+          variant="filled"
+        >
+          <AlertTitle>Erro</AlertTitle>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

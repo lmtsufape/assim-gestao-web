@@ -53,8 +53,8 @@ const MenuOptions = () => {
     },
     {
       icon: <PiStorefrontLight />,
-      name: 'Bancas',
-      route: '/bancas',
+      name: 'Feiras',
+      route: '/feiras',
       roles: ['administrador', 'presidente'],
     },
     {

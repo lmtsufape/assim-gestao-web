@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import React from 'react';
 import { BiSolidTrashAlt, BiSolidEditAlt } from 'react-icons/bi';
-import { BsInfoCircle } from 'react-icons/bs';
+import { BsFillEyeFill, BsInfoCircle } from 'react-icons/bs';
+import { FaStore } from 'react-icons/fa';
 
 import S from './styles.module.scss';
 
@@ -14,10 +15,18 @@ import StyledLink from '@/components/Link';
 import Loader from '@/components/Loader';
 import TableView from '@/components/Table/Table';
 
-import { getAllCidades, removeCidade } from '@/services/cidades';
-import { Box, IconButton, Tooltip, Modal, Typography } from '@mui/material';
+import { getAllFeiras, deleteFeira } from '@/services/feiras';
+import {
+  Box,
+  IconButton,
+  Tooltip,
+  Modal,
+  Typography,
+  Snackbar,
+  Alert,
+  AlertTitle,
+} from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Estado } from '@/types/api';
 
 const style = {
   position: 'absolute' as const,
@@ -32,11 +41,12 @@ const style = {
   p: 4,
 };
 
-export default function Cidades() {
+export default function Feiras() {
   const [value, setValue] = React.useState(0);
   const handleClose = () => setValue(0);
   const [token, setToken] = React.useState('');
   const [infoModalOpen, setInfoModalOpen] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
 
   React.useEffect(() => {
     const token = localStorage.getItem('@token');
@@ -54,29 +64,39 @@ export default function Cidades() {
 
   const mutation = useMutation({
     mutationFn: ({ token, value }: { token: string; value: number }) => {
-      return removeCidade(token, value);
+      return deleteFeira(token, value);
     },
     onSuccess: () => {
       refetch();
       handleClose();
     },
+    onError: (error: any) => {
+      setErrorMessage(error.message);
+    },
   });
 
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['cidades'],
+    queryKey: ['feiras'],
     queryFn: () => {
       const token = localStorage.getItem('@token');
       if (token) {
-        return getAllCidades(token);
+        return getAllFeiras(token);
       }
       return null;
     },
   });
 
   if (isLoading) return <Loader />;
-  if (isError) return `Error: ${error.message}`;
+  if (isError) return `Error: ${error?.message}`;
+
   const handleOpenInfoModal = () => setInfoModalOpen(true);
   const handleCloseInfoModal = () => setInfoModalOpen(false);
+
+  const formatHorariosFuncionamento = (horarios: Record<string, string[]>) => {
+    return Object.entries(horarios)
+      .map(([dia]) => `${dia}`)
+      .join(', ');
+  };
 
   const columns: any = [
     {
@@ -84,12 +104,16 @@ export default function Cidades() {
       accessorKey: 'nome',
     },
     {
-      header: 'Estado',
-      accessorKey: 'estado',
+      header: 'Dia da Semana',
+      accessorKey: 'horarios_funcionamento',
       cell: (info: any) => {
-        const value: Estado = info.getValue();
-        return <p>{value?.nome}</p>;
+        const value = info.getValue();
+        return <p>{formatHorariosFuncionamento(value)}</p>;
       },
+    },
+    {
+      header: 'Descrição',
+      accessorKey: 'descricao',
     },
     {
       header: () => (
@@ -112,10 +136,28 @@ export default function Cidades() {
         return (
           <ul className={S.action} role="list">
             <li>
-              <Link href={'cidades/editar/' + value}>
+              <Link href={`feiras/${value}`}>
+                <Tooltip title="Ver Detalhes">
+                  <IconButton aria-label="detalhes" size="small">
+                    <BsFillEyeFill />
+                  </IconButton>
+                </Tooltip>
+              </Link>
+            </li>
+            <li>
+              <Link href={`feiras/editar/${value}`}>
                 <Tooltip title="Editar">
                   <IconButton aria-label="editar" size="small">
                     <BiSolidEditAlt />
+                  </IconButton>
+                </Tooltip>
+              </Link>
+            </li>
+            <li>
+              <Link href={`feiras/${value}/bancas`}>
+                <Tooltip title="Ver Bancas">
+                  <IconButton aria-label="bancas" size="small">
+                    <FaStore />
                   </IconButton>
                 </Tooltip>
               </Link>
@@ -148,18 +190,22 @@ export default function Cidades() {
               </Link>
             </div>
             <div>
-              <h1 className={S.title}>Cidades</h1>
+              <h1 className={S.title}>Feiras</h1>
             </div>
             <div className={S.addButton}>
               <StyledLink
-                href="cidades/cadastrar"
+                href="feiras/cadastrar"
                 data-type="filled"
-                text="Adicionar Nova Cidade"
+                text="Adicionar Nova Feira"
               />
             </div>
           </div>
         </div>
-        <TableView columns={columns} data={data} />
+        {data && data.feiras ? (
+          <TableView columns={columns} data={data.feiras} />
+        ) : (
+          <p>Nenhuma feira encontrada</p>
+        )}
       </section>
       <div>
         <Modal
@@ -203,17 +249,31 @@ export default function Cidades() {
             <Typography id="info-modal-description" sx={{ mt: 2 }}>
               <ul>
                 <li>
+                  <BsFillEyeFill
+                    style={{ verticalAlign: 'middle', marginRight: '5px' }}
+                  />
+                  <strong>Ver Detalhes:</strong> Abre uma página com os detalhes
+                  da feira.
+                </li>
+                <li>
                   <BiSolidEditAlt
                     style={{ verticalAlign: 'middle', marginRight: '5px' }}
                   />
                   <strong>Editar:</strong> Permite modificar informações da
-                  cidade.
+                  feira.
+                </li>
+                <li>
+                  <FaStore
+                    style={{ verticalAlign: 'middle', marginRight: '5px' }}
+                  />
+                  <strong>Ver Bancas:</strong> Abre uma página com as bancas
+                  associadas à feira.
                 </li>
                 <li>
                   <BiSolidTrashAlt
                     style={{ verticalAlign: 'middle', marginRight: '5px' }}
                   />
-                  <strong>Remover:</strong> Exclui a cidade após confirmação.
+                  <strong>Remover:</strong> Exclui a feira após confirmação.
                 </li>
               </ul>
               <br />
@@ -227,6 +287,20 @@ export default function Cidades() {
             </Button>
           </Box>
         </Modal>
+        <Snackbar
+          open={errorMessage.length > 0}
+          autoHideDuration={6000}
+          onClose={() => setErrorMessage('')}
+        >
+          <Alert
+            onClose={() => setErrorMessage('')}
+            severity="error"
+            variant="filled"
+          >
+            <AlertTitle>Erro</AlertTitle>
+            {errorMessage}
+          </Alert>
+        </Snackbar>
       </div>
     </div>
   );

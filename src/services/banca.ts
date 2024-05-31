@@ -52,7 +52,7 @@ export const deleteBanca = async (token: string, bancaId: number) => {
 };
 
 export const getAgricultor = async (token: string, agricultorId: number) => {
-  const response = await api.get(`/api/bancas/agricultores/${agricultorId}`, {
+  const response = await api.get(`/api/bancas/agricultor/${agricultorId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

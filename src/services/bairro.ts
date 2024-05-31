@@ -16,3 +16,48 @@ export async function getAllBairros(
     throw new Error('Failed to fetch bairros');
   }
 }
+
+export async function deleteBairro(token: string, id: number): Promise<void> {
+  try {
+    await api.delete(`/api/bairros/${id}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    throw new Error('Failed to delete bairro');
+  }
+}
+
+export async function createBairro(
+  token: string,
+  bairro: Partial<Bairro>,
+): Promise<{ bairro: Bairro }> {
+  try {
+    const response = await api.post('/api/bairros', bairro, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to create bairro');
+  }
+}
+
+export async function updateBairro(
+  token: string,
+  id: number,
+  bairro: Partial<Bairro>,
+): Promise<{ bairro: Bairro }> {
+  try {
+    const response = await api.put(`/api/bairros/${id}`, bairro, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to update bairro');
+  }
+}

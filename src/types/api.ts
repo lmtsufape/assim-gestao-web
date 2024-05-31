@@ -113,12 +113,8 @@ export interface Reunioes {
   status?: string;
   ata?: string[];
   participantes: { id: number }[];
-  associacao_id: number;
+  associacao_id: number | null;
   organizacao_id?: number | null;
-  associacao?: {
-    id: number;
-    nome: string;
-  };
 }
 
 export interface FormaPagamento {
@@ -139,14 +135,19 @@ export interface Venda {
 export interface Bairro {
   id: number;
   nome: string;
-  pivot: {
-    taxa: number;
-  };
 }
 
 export interface Feira {
   id: number;
   nome: string;
+  descricao: string;
+  localizacao: string;
+  horarios_funcionamento: {
+    [key: string]: [string, string];
+  };
+  bairro_id: number;
+  associacao_id?: number | null;
+  imagem?: string;
 }
 
 export interface Agricultor {

@@ -23,8 +23,6 @@ export default function Home() {
   const [pauta, setPauta] = React.useState('');
   const [date, setDate] = React.useState('');
   const [tipo, setTipo] = React.useState('');
-
-  const [selectedAssociacoes] = React.useState(0);
   const [selectedOcs, setSelectedOcs] = React.useState(0);
   const [selectedParticipantes, setSelectedParticipantes] = React.useState<
     string | string[]
@@ -71,12 +69,13 @@ export default function Home() {
       const token = localStorage.getItem('@token');
       if (!token) {
         redirect('/');
+        return;
       }
 
       if (selectedParticipantes.length < 2) {
+        setErrorMessage('Selecione pelo menos duas pessoas para a reunião.');
         setTimeout(() => {
-          setErrorMessage('Selecione pelo menos duas pessoas para a reunião.');
-          window.location.reload();
+          setErrorMessage('');
         }, 3000);
         return;
       }
@@ -92,23 +91,25 @@ export default function Home() {
         organizacaoIdToSend = null;
       }
 
-      await createReuniao(
-        {
-          titulo,
-          pauta,
-          data: date,
-          tipo,
-          organizacao_id: organizacaoIdToSend,
-          participantes: selectedParticipantIds.map((id) => ({ id })),
-          associacao_id: selectedAssociacoes,
-        },
-        token,
-      );
+      const requestBody = {
+        titulo,
+        pauta,
+        data: date,
+        tipo,
+        organizacao_id: organizacaoIdToSend,
+        participantes: selectedParticipantIds.map((id) => ({ id })),
+        associacao_id: 1,
+      };
+
+      console.log('Request Body:', requestBody); // Adicionando log para verificar o corpo da requisição
+
+      await createReuniao(requestBody, token);
       router.back();
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log('Error:', error);
+      setErrorMessage('Erro ao criar reunião');
       setTimeout(() => {
-        setErrorMessage('Erro ao criar reunião');
+        setErrorMessage('');
       }, 3000);
     }
   };
