@@ -28,6 +28,28 @@
   color: white;
 }
 
+.ufapelmtsWrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.imageContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ufapeLogo {
+  max-width: 60px; /* Tamanho da logo da UFAPE */
+  max-height: 55px; /* Tamanho da logo da UFAPE */
+}
+
+.lmtsLogo {
+  max-width: 90px; /* Tamanho da logo do LMTS */
+  max-height: 40px; /* Tamanho da logo do LMTS */
+}
+
 .socialNetwork {
   display: flex;
   gap: 1.5rem;
@@ -50,7 +72,10 @@
   .logoImg {
     width: 20%;
   }
-  .ufapeLmts {
+  .ufapeLogo {
+    padding: 0.6rem;
+  }
+  .lmtsLogo {
     padding: 0.6rem;
   }
 }
