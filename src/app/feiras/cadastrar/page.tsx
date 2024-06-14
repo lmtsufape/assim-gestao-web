@@ -18,6 +18,7 @@ import {
   ListItemText,
   OutlinedInput,
   TextField,
+  SelectChangeEvent,
 } from '@mui/material';
 import { getAllBairros } from '@/services';
 import { createFeira } from '@/services/feiras';
@@ -94,7 +95,7 @@ export default function CreateFeira() {
     }
   };
 
-  const handleDiasChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleDiasChange = (event: SelectChangeEvent<string[]>) => {
     const value = event.target.value as string[];
     setDiasSelecionados(value);
   };

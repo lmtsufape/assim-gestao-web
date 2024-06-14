@@ -17,6 +17,7 @@ import {
   Checkbox,
   ListItemText,
   OutlinedInput,
+  SelectChangeEvent,
 } from '@mui/material';
 import { getFeira, updateFeira } from '@/services/feiras';
 import { getAllBairros } from '@/services';
@@ -99,7 +100,7 @@ export default function UpdateFeira({ params }: UpdateFeiraProps) {
     }
   };
 
-  const handleDiasChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleDiasChange = (event: SelectChangeEvent<string[]>) => {
     const value = event.target.value as string[];
     setDiasSelecionados(value);
   };
