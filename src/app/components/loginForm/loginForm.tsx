@@ -24,10 +24,10 @@ export const LoginForm = () => {
     } catch (error: any) {
       const errors = error.response?.data?.errors;
       if (errors !== undefined && errors !== null) {
-        for (const key of Object.keys(errors)) {
-          const errorMessage = errors[key][0];
-          setError(`${errorMessage}`);
-        }
+        /*  const errorMessages = Object.values(errors).map(
+          (errArray: any) => errArray[0],
+        ); */
+        setError(`Verifique os campos, e tente novamente!`);
       }
     }
   };
@@ -48,7 +48,7 @@ export const LoginForm = () => {
           />
         </div>
         <div>
-          <label htmlFor="email">Senha</label>
+          <label htmlFor="password">Senha</label>
           <Input
             placeholder="*********"
             name="password"
@@ -68,9 +68,13 @@ export const LoginForm = () => {
           Entrar
         </Button>
       </form>
-      <Snackbar open={error.length > 0} autoHideDuration={6000}>
-        <Alert variant="filled" severity="error">
-          <AlertTitle>Erro!</AlertTitle>
+      <Snackbar
+        open={error.length > 0}
+        autoHideDuration={6000}
+        onClose={() => setError('')}
+      >
+        <Alert variant="filled" severity="error" onClose={() => setError('')}>
+          <AlertTitle>Erro ao fazer login!</AlertTitle>
           {error}
         </Alert>
       </Snackbar>
