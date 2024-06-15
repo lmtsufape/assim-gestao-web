@@ -1,22 +1,13 @@
 .loader {
   border: 4px solid rgba(0, 0, 0, 0.1);
-  border-left-color: transparent;
+  border-left-color: #008000; /* Cor verde */
   border-radius: 50%;
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  width: 36px;
+  height: 36px;
   margin: 6rem auto;
-}
-
-.loader {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-left-color: transparent;
-  width: 36px;
-  height: 36px;
-}
-
-.loader {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-left-color: transparent;
-  width: 36px;
-  height: 36px;
   animation: spin89345 1s linear infinite;
 }
 

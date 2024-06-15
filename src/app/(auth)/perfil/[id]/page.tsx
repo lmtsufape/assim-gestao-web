@@ -42,7 +42,7 @@ const ProfilePage = () => {
     <main className={S.main}>
       <div className={S.container}>
         <div className={S.back}>
-          <Link href="/register" className={S.link}>
+          <Link href="/menu" className={S.link}>
             &lt; Voltar
           </Link>
         </div>
@@ -58,8 +58,7 @@ const ProfilePage = () => {
           <div className={S.editButton}>
             <Button onClick={handleEdit} type="button" dataType="edit">
               {' '}
-              Editar
-              <BiSolidEditAlt />
+              Editar <BiSolidEditAlt />
             </Button>
           </div>
         </div>

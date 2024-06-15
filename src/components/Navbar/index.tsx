@@ -50,7 +50,6 @@ const Navbar = () => {
   );
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
-    anchorElNav;
     setAnchorElNav(event.currentTarget);
   };
 
@@ -76,10 +75,14 @@ const Navbar = () => {
       <AppBar className={styles.navbar} position="absolute">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <Link href="/menu">
-              <Image src={Icons.Logo} alt="Logo Gestão" />
+            <Link href="/menu" className={styles.logoContainer}>
+              <Image
+                src={Icons.Logo}
+                alt="Logo Gestão"
+                className={styles.logoImage}
+              />
+              <h1>Gestão</h1>
             </Link>
-            <h1>Gestão</h1>
             <Box
               sx={{
                 flexGrow: 1,
@@ -120,7 +123,7 @@ const Navbar = () => {
                   open={Boolean(anchorElProfile)}
                   onClose={() => setAnchorElProfile(null)}
                 >
-                  <MenuItem onClick={perfil}> Perfil</MenuItem>
+                  <MenuItem onClick={perfil}>Perfil</MenuItem>
                   <MenuItem onClick={logout}>Sair</MenuItem>
                 </Menu>
               </Box>

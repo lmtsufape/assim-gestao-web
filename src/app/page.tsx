@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import React from 'react';
 
-import S from './components/styles.module.scss';
+import S from './components/loginForm/styles.module.scss';
 
-import { LoginForm } from './components/loginForm';
+import { LoginForm } from './components/loginForm/loginForm';
 import { Container } from '@mui/material';
 
 export default function Home() {
@@ -16,7 +16,7 @@ export default function Home() {
             O sistema Gestão foi desenvolvido pela Universidade Federal do
             Agreste de Pernambuco (UFAPE) em resposta à demanda da Associação de
             Produtores e Moradores Agroecológico do Imbé, Marreco e Sítio
-            Vizinho- ASSIM para uma gestão sustentável no setor agrícola.
+            Vizinho - ASSIM para uma gestão sustentável no setor agrícola.
             Projetada para facilitar a integração e o controle de processos, a
             plataforma otimiza o gerenciamento das atividades em associações e
             organizações sociais e o registro dos agricultores nas demais
