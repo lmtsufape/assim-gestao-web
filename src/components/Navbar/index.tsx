@@ -45,14 +45,6 @@ const Navbar = () => {
     setAnchorElProfile(event.currentTarget);
   };
 
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null,
-  );
-
-  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
-
   const logout = () => {
     localStorage.clear();
     window.location.href = '/';
@@ -95,7 +87,7 @@ const Navbar = () => {
                 aria-label="opções de páginas de navegação"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
-                onClick={handleOpenMenu}
+                onClick={handleOpenProfileMenu} // Reutilizando o mesmo método para o menu em dispositivos móveis
               >
                 <BiMenu className={styles.menu} />
               </IconButton>

@@ -22,15 +22,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-br">
-      <ReactQueryProvider>
-        <ThemeRegistry>
-          <body className={inter.className}>
+      <head>
+        {metadata.title && <title>{String(metadata.title)}</title>}
+        {metadata.description && (
+          <meta name="description" content={metadata.description} />
+        )}
+      </head>
+      <body className={inter.className}>
+        <ReactQueryProvider>
+          <ThemeRegistry>
             <Navbar />
             {children}
             <Footer />
-          </body>
-        </ThemeRegistry>
-      </ReactQueryProvider>
+          </ThemeRegistry>
+        </ReactQueryProvider>
+      </body>
     </html>
   );
 }
