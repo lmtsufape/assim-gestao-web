@@ -229,7 +229,7 @@ const RegisterForm = () => {
           <InputLabel id="cidade-label">Cidade</InputLabel>
           <FormControl fullWidth>
             <Select
-              style={{ borderRadius: '10px' }}
+              style={{ borderRadius: '8px' }}
               labelId="cidade-label"
               id="cidade"
               value={selectedCidade}
@@ -251,7 +251,7 @@ const RegisterForm = () => {
           </label>
           <FormControl fullWidth error={bairroError}>
             <Select
-              style={{ borderRadius: '10px' }}
+              style={{ borderRadius: '8px' }}
               labelId="bairro-label"
               id="bairro"
               value={selectedBairro}
