@@ -6,7 +6,8 @@ import { SiFacebook, SiInstagram } from 'react-icons/si';
 import S from './styles.module.scss';
 
 import { Icons } from '@/assets';
-import UfapeLMTS from '@/assets/ufape-lmts.svg';
+import LMTS from '@/assets/lmts.png';
+import Ufape from '@/assets/ufape.png';
 
 const Footer = () => {
   return (
@@ -21,11 +22,12 @@ const Footer = () => {
           <p>Gestão</p>
         </li>
         <li className={S.ufapelmtsWrapper}>
-          <Image
-            className={S.ufapeLmts}
-            src={UfapeLMTS}
-            alt="ufape e lmts logo"
-          />
+          <div className={S.imageContainer}>
+            <Image className={S.ufapeLogo} src={Ufape} alt="ufape logo" />
+          </div>
+          <div className={S.imageContainer}>
+            <Image className={S.lmtsLogo} src={LMTS} alt="lmts logo" />
+          </div>
         </li>
         <li className={S.socialNetwork}>
           <GoMail className={S.email} />

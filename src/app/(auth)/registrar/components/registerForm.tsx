@@ -3,8 +3,12 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React from 'react';
-import { MdManageAccounts } from 'react-icons/md';
+import React, { useEffect, useState } from 'react';
+import {
+  MdManageAccounts,
+  MdVisibility,
+  MdVisibilityOff,
+} from 'react-icons/md';
 
 import S from './styles.module.scss';
 
@@ -13,36 +17,100 @@ import Input from '@/components/Input';
 import StyledLink from '@/components/Link';
 
 import { createUser } from '@/services/user';
-import { Alert, AlertTitle, Snackbar } from '@mui/material';
+import { getAllCidades } from '@/services/cidades';
+
+import {
+  Alert,
+  AlertTitle,
+  Snackbar,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  SelectChangeEvent,
+  FormHelperText,
+} from '@mui/material';
+import { Bairro, Cidade } from '@/types/api';
+import { getAllBairrosByCidade } from '@/services';
 
 const RegisterForm = () => {
-  const [name, setName] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [telefone, setTelefone] = React.useState('');
-  const [cpf, setCpf] = React.useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [cpf, setCpf] = useState('');
 
-  const [street, setStreet] = React.useState('');
-  const [cep, setCEP] = React.useState('');
-  const [number, setNumber] = React.useState('');
+  const [street, setStreet] = useState('');
+  const [cep, setCEP] = useState('');
+  const [number, setNumber] = useState('');
+  const [complemento, setComplemento] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const selectedBairro = 1;
+  const [error, setError] = useState('');
 
-  const [error, setError] = React.useState('');
+  const [cidades, setCidades] = useState<Cidade[]>([]);
+  const [bairros, setBairros] = useState<Bairro[]>([]);
+  const [selectedCidade, setSelectedCidade] = useState<number>(1);
+  const [selectedBairro, setSelectedBairro] = useState<number | ''>('');
+  const [bairroError, setBairroError] = useState<boolean>(false);
 
   const router = useRouter();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('@token');
       if (token) {
         router.push('/menu');
+      } else {
+        fetchCidades(token!);
+        fetchBairros(token!, 1);
       }
     }
   }, [router]);
 
+  const fetchCidades = async (token: string) => {
+    try {
+      const cidades = await getAllCidades(token);
+      setCidades(cidades);
+    } catch (error) {
+      console.error('Failed to fetch cidades:', error);
+    }
+  };
+
+  const fetchBairros = async (token: string, cidadeId: number) => {
+    try {
+      const { bairros } = await getAllBairrosByCidade(token, cidadeId);
+      setBairros(bairros);
+      console.log('Bairros fetched:', bairros);
+    } catch (error) {
+      console.error('Failed to fetch bairros:', error);
+    }
+  };
+
+  const handleCidadeChange = (event: SelectChangeEvent<number>) => {
+    const token = localStorage.getItem('@token');
+
+    const cidadeId = event.target.value as number;
+    setSelectedCidade(cidadeId);
+    fetchBairros(token!, cidadeId);
+  };
+
+  const handleBairroChange = (event: SelectChangeEvent<number>) => {
+    const bairroId = event.target.value as number;
+    setSelectedBairro(bairroId);
+    setBairroError(false);
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (typeof selectedBairro !== 'number') {
+      setBairroError(true);
+      setError('Bairro é obrigatório');
+      return;
+    }
+
+    const token = localStorage.getItem('@token');
+
     try {
       await createUser(
         {
@@ -58,7 +126,7 @@ const RegisterForm = () => {
           numero: number,
           bairro_id: selectedBairro,
         },
-        '',
+        token!,
       );
       router.back();
     } catch (error: any) {
@@ -71,6 +139,10 @@ const RegisterForm = () => {
         }
       }
     }
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -107,17 +179,24 @@ const RegisterForm = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
-        <div>
-          <label htmlFor="password">
-            Senha<span>*</span>
-          </label>
+        <label htmlFor="password">
+          Senha<span>*</span>
+        </label>
+        <div className={S.passwordInput}>
           <Input
             name="password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="*******"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          <button
+            type="button"
+            onClick={toggleShowPassword}
+            className={S.togglePasswordButton}
+          >
+            {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
+          </button>
         </div>
         <div>
           <label htmlFor="telefone">
@@ -146,6 +225,62 @@ const RegisterForm = () => {
           />
         </div>
         <h3>Endereço</h3>
+        <div>
+          <InputLabel id="cidade-label">Cidade</InputLabel>
+          <FormControl fullWidth>
+            <Select
+              style={{ borderRadius: '8px' }}
+              labelId="cidade-label"
+              id="cidade"
+              value={selectedCidade}
+              placeholder="Cidade"
+              onChange={handleCidadeChange}
+              label="Cidade"
+            >
+              {cidades.map((cidade) => (
+                <MenuItem key={cidade.id} value={cidade.id}>
+                  {cidade.nome}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+        <div>
+          <label htmlFor="bairro_id">
+            Bairro<span>*</span>
+          </label>
+          <FormControl fullWidth error={bairroError}>
+            <Select
+              style={{ borderRadius: '8px' }}
+              labelId="bairro-label"
+              id="bairro"
+              value={selectedBairro}
+              onChange={handleBairroChange}
+              label="Bairro"
+              displayEmpty
+            >
+              <MenuItem value="" disabled>
+                <span
+                  style={{
+                    color: '#a4a4a4',
+                    fontSize: '15px',
+                    marginLeft: ' -5px',
+                  }}
+                >
+                  Bairro
+                </span>
+              </MenuItem>
+              {bairros.map((bairro) => (
+                <MenuItem key={bairro.id} value={bairro.id}>
+                  {bairro.nome}
+                </MenuItem>
+              ))}
+            </Select>
+            {bairroError && (
+              <FormHelperText>Bairro é obrigatório</FormHelperText>
+            )}
+          </FormControl>
+        </div>
         <div>
           <label htmlFor="street">
             Rua<span>*</span>
@@ -183,6 +318,16 @@ const RegisterForm = () => {
             onChange={(e) => setNumber(e.target.value)}
           />
         </div>
+        <div>
+          <label htmlFor="text">Complemento</label>
+          <Input
+            name="complemento"
+            type="text"
+            placeholder="Complemento"
+            value={complemento}
+            onChange={(e) => setComplemento(e.target.value)}
+          />
+        </div>
         <div className={S.wrapperButtons}>
           <StyledLink href="/" data-type="transparent" text="Voltar" />
           <Button dataType="filled" type="submit">
@@ -190,7 +335,7 @@ const RegisterForm = () => {
           </Button>
         </div>
       </form>
-      <Snackbar open={error.length > 0} autoHideDuration={6000}>
+      <Snackbar open={error.length > 0} autoHideDuration={1000}>
         <Alert variant="filled" severity="error">
           <AlertTitle>Erro!</AlertTitle>
           {error}

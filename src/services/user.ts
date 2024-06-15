@@ -45,7 +45,7 @@ export async function signIn(email: string, password: string) {
   const response = await api.post('/api/sanctum/token', {
     email,
     password,
-    device_name: 'Ellen', // TODO: Get Device Name
+    device_name: 'WEB', // TODO: Get Device Name
   });
   localStorage.setItem('@token', response.data.token);
   localStorage.setItem('@roles', JSON.stringify(response.data.user.roles));

@@ -17,6 +17,24 @@ export async function getAllBairros(
   }
 }
 
+export async function getAllBairrosByCidade(
+  token: string,
+  id: number,
+): Promise<{ bairros: Bairro[] }> {
+  try {
+    const response = await api.get(`/api/bairros/cidade/${id}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+    console.log('Response data:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching bairros in a cidade:', error);
+    throw new Error('Failed to fetch bairros in a cidade');
+  }
+}
+
 export async function deleteBairro(token: string, id: number): Promise<void> {
   try {
     await api.delete(`/api/bairros/${id}`, {

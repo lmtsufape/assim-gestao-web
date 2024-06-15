@@ -1,43 +1,48 @@
-.navbar[class~="MuiPaper-root"] {
-    background-color: white;
-    box-shadow: 1px solid rgba(0, 0, 0, 0.12);
-    padding-block: 8px;
+.navbar[class~='MuiPaper-root'] {
+  background-color: white;
+  box-shadow: 1px solid rgba(0, 0, 0, 0.12);
+  padding-block: 8px;
 
-    h1{
-        color:  #008000;
-        font-size: 1.5rem;
-        margin-left: 10px;
-        
-    }
+  .logoContainer {
+    display: flex;
+    align-items: center;
+    text-decoration: none; /* Remove sublinhado */
+  }
+
+  h1 {
+    color: #008000;
+    font-size: 1.5rem;
+    margin-left: 10px;
+    display: inline-block;
+    vertical-align: middle;
+    text-decoration: none; /* Remove sublinhado */
+  }
 }
 
 .menuItem a {
-    font-size: 1rem;
-    padding: .5rem 1rem;
-    text-decoration: none;
-    color: white;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: white;
 
-    @media (max-width: 899px) {
-        color: black !important;
-    }
+  @media (max-width: 899px) {
+    color: black !important;
+  }
 }
 
 .active {
-    color: white;
-    font-weight: bold;
+  color: white;
+  font-weight: bold;
 }
 
 .logout {
-    cursor: pointer;
-    border: none;
-    background: none;
-    color: #008000;; 
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: #008000;
 }
-  
 
-@media (max-width: 768px) {
-    .image {
-        width: 70%;
-        height: auto;
-    }
+.logo-image {
+  width: auto;
+  height: 45px; /* Ajuste conforme necessário */
 }

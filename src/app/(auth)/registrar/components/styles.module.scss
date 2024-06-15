@@ -1,6 +1,8 @@
 .registerForm {
   max-width: 850px;
-  margin: 3rem auto;
+  margin: 8rem auto;
+  margin-top: 8rem;
+  margin-bottom: 4rem;
   padding: 1.5rem 1rem;
   border-radius: 20px;
   background: #fff;
@@ -10,7 +12,7 @@
 
   .loginMessage {
     text-align: center;
-    font-size: .875rem;
+    font-size: 0.875rem;
     a {
       text-decoration: underline;
       color: #008000;
@@ -19,7 +21,7 @@
 
   h1 {
     text-align: center;
-    padding-bottom: .3rem;
+    padding-bottom: 0.3rem;
     color: #008000;
     font-weight: 800;
     display: flex;
@@ -37,7 +39,7 @@
       color: #d23030;
     }
   }
-  
+
   input {
     display: block;
     width: 100%;
@@ -71,4 +73,20 @@
   padding-inline: 2rem;
   grid-row: span 2;
   place-self: center;
+}
+
+.passwordInput {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.togglePasswordButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
 }

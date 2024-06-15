@@ -45,15 +45,6 @@ const Navbar = () => {
     setAnchorElProfile(event.currentTarget);
   };
 
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null,
-  );
-
-  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
-    anchorElNav;
-    setAnchorElNav(event.currentTarget);
-  };
-
   const logout = () => {
     localStorage.clear();
     window.location.href = '/';
@@ -76,10 +67,14 @@ const Navbar = () => {
       <AppBar className={styles.navbar} position="absolute">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <Link href="/menu">
-              <Image src={Icons.Logo} alt="Logo Gestão" />
+            <Link href="/menu" className={styles.logoContainer}>
+              <Image
+                src={Icons.Logo}
+                alt="Logo Gestão"
+                className={styles.logoImage}
+              />
+              <h1>Gestão</h1>
             </Link>
-            <h1>Gestão</h1>
             <Box
               sx={{
                 flexGrow: 1,
@@ -92,7 +87,7 @@ const Navbar = () => {
                 aria-label="opções de páginas de navegação"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
-                onClick={handleOpenMenu}
+                onClick={handleOpenProfileMenu} // Reutilizando o mesmo método para o menu em dispositivos móveis
               >
                 <BiMenu className={styles.menu} />
               </IconButton>
@@ -120,7 +115,7 @@ const Navbar = () => {
                   open={Boolean(anchorElProfile)}
                   onClose={() => setAnchorElProfile(null)}
                 >
-                  <MenuItem onClick={perfil}> Perfil</MenuItem>
+                  <MenuItem onClick={perfil}>Perfil</MenuItem>
                   <MenuItem onClick={logout}>Sair</MenuItem>
                 </Menu>
               </Box>
