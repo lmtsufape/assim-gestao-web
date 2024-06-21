@@ -1,8 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { BiMenu } from 'react-icons/bi';
 
@@ -24,6 +23,7 @@ import {
 
 const Navbar = () => {
   const params = usePathname();
+  const router = useRouter();
   const [userId, setUserId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -50,6 +50,14 @@ const Navbar = () => {
     window.location.href = '/';
   };
 
+  const handleLogoClick = () => {
+    if (params === '/registrar') {
+      router.push('/');
+    } else if (params !== '/') {
+      router.push('/menu');
+    }
+  };
+
   return (
     <ThemeProvider
       theme={createTheme({
@@ -67,14 +75,18 @@ const Navbar = () => {
       <AppBar className={styles.navbar} position="absolute">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <Link href="/menu" className={styles.logoContainer}>
+            <Box
+              sx={{ cursor: 'pointer' }}
+              className={styles.logoContainer}
+              onClick={handleLogoClick}
+            >
               <Image
                 src={Icons.Logo}
                 alt="Logo Gestão"
                 className={styles.logoImage}
               />
               <h1>Gestão</h1>
-            </Link>
+            </Box>
             <Box
               sx={{
                 flexGrow: 1,
@@ -87,7 +99,7 @@ const Navbar = () => {
                 aria-label="opções de páginas de navegação"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
-                onClick={handleOpenProfileMenu} // Reutilizando o mesmo método para o menu em dispositivos móveis
+                onClick={handleOpenProfileMenu}
               >
                 <BiMenu className={styles.menu} />
               </IconButton>

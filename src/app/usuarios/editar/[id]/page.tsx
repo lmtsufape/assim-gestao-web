@@ -25,7 +25,7 @@ const Home = ({ params }: { params: { id: string } }) => {
 
   const [selectedRole, setSelectedRole] = React.useState<string | string[]>([
     '2',
-  ]);
+  ]); // Pegar do usuário
 
   const [error, setError] = React.useState('');
 

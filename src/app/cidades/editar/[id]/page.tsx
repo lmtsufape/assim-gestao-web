@@ -69,9 +69,10 @@ export default function EditCity({ params }: EditCityProps) {
         redirect('/');
       }
 
-      const cidadeData = new FormData();
-      cidadeData.append('nome', name);
-      cidadeData.append('estado_id', selectedEstado.toString());
+      const cidadeData = {
+        nome: name,
+        estado_id: Number(selectedEstado),
+      };
 
       await updateCidade(token, params.id, cidadeData);
       router.back();

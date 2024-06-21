@@ -112,7 +112,7 @@ export default function Cidades() {
         return (
           <ul className={S.action} role="list">
             <li>
-              <Link href={'cidades/editar/' + value}>
+              <Link href={'/cidades/editar/' + value}>
                 <Tooltip title="Editar">
                   <IconButton aria-label="editar" size="small">
                     <BiSolidEditAlt />

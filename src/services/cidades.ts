@@ -38,7 +38,7 @@ export const createCidade = async (
 export const updateCidade = async (
   token: string,
   cidadeId: number,
-  cidadeData: FormData,
+  cidadeData: { nome: string; estado_id: number },
 ): Promise<Cidade> => {
   const response = await api.patch(`/api/cidades/${cidadeId}`, cidadeData, {
     headers: {
