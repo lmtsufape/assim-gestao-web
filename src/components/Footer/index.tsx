@@ -6,8 +6,8 @@ import { SiFacebook, SiInstagram } from 'react-icons/si';
 import S from './styles.module.scss';
 
 import { Icons } from '@/assets';
-import LMTS from '@/assets/lmts.png';
-import Ufape from '@/assets/ufape.png';
+import LMTS from '@/assets/lmts.svg';
+import Ufape from '@/assets/ufape.svg';
 
 const Footer = () => {
   return (
