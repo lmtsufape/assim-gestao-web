@@ -41,7 +41,8 @@ export default function Home() {
   const [bairro, setBairro] = React.useState<Bairro[]>([]);
   const [selectedBairro, setSelectedBairro] = React.useState(0);
 
-  const [error, setError] = React.useState('');
+  const [errorMessages, setErrorMessages] = React.useState<string[]>([]);
+  const [currentError, setCurrentError] = React.useState<string | null>(null);
 
   const router = useRouter();
 
@@ -103,8 +104,38 @@ export default function Home() {
     return selectedAgricultoresIds;
   };
 
+  const validateFields = () => {
+    const errors = {
+      name: name.length >= 10 ? '' : 'Nome deve ter pelo menos 10 caracteres.',
+      email: email ? '' : 'E-mail é obrigatório.',
+      cnpj: cnpj ? '' : 'CNPJ é obrigatório.',
+      telefone: telefone ? '' : 'Telefone é obrigatório.',
+      street: street ? '' : 'Rua é obrigatória.',
+      cep: cep ? '' : 'CEP é obrigatório.',
+      number: number ? '' : 'Número é obrigatório.',
+      selectedAssociacoes: selectedAssociacoes
+        ? ''
+        : 'Associação é obrigatória.',
+      selectedAgricultores: selectedAgricultores.length
+        ? ''
+        : 'Agricultores são obrigatórios.',
+      selectedBairro: selectedBairro ? '' : 'Bairro é obrigatório.',
+    };
+
+    const errorMessages = Object.values(errors).filter((error) => error);
+    return errorMessages;
+  };
+
   const handleRegister: (e: React.FormEvent) => Promise<void> = async (e) => {
     e.preventDefault();
+
+    const validationErrors = validateFields();
+    if (validationErrors.length) {
+      setErrorMessages(validationErrors);
+      setCurrentError(validationErrors[0]);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('@token');
       if (!token) {
@@ -141,18 +172,34 @@ export default function Home() {
           error.message === 'CNPJ já cadastrado em outra organização.' ||
           error.message === 'CNPJ inválido.')
       ) {
-        setError(error.message);
+        setErrorMessages([error.message]);
+        setCurrentError(error.message);
       } else {
         const errors = error.response?.data?.errors;
         if (errors !== undefined && errors !== null) {
+          const errorList = [];
           for (const key of Object.keys(errors)) {
             const errorMessage = errors[key][0];
-            setError(`${errorMessage}`);
-            return; // Para evitar que continue atualizando o estado com outras mensagens
+            errorList.push(errorMessage);
           }
+          setErrorMessages(errorList);
+          setCurrentError(errorList[0]);
         } else {
-          setError('Erro ao processar a requisição.');
+          setErrorMessages(['Erro ao processar a requisição.']);
+          setCurrentError('Erro ao processar a requisição.');
         }
+      }
+    }
+  };
+
+  const handleClose = () => {
+    if (currentError !== null) {
+      const nextIndex = errorMessages.indexOf(currentError) + 1;
+      if (nextIndex < errorMessages.length) {
+        setCurrentError(errorMessages[nextIndex]);
+      } else {
+        setCurrentError(null);
+        setErrorMessages([]);
       }
     }
   };
@@ -327,13 +374,13 @@ export default function Home() {
         </form>
       </div>
       <Snackbar
-        open={error.length > 0}
+        open={currentError !== null}
         autoHideDuration={6000}
-        onClose={() => setError('')}
+        onClose={handleClose}
       >
-        <Alert variant="filled" severity="error" onClose={() => setError('')}>
+        <Alert variant="filled" severity="error" onClose={handleClose}>
           <AlertTitle>Erro!</AlertTitle>
-          {error}
+          {currentError}
         </Alert>
       </Snackbar>
     </main>
