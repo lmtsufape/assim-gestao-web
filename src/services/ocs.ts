@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from './api';
 import { OCS } from '@/types/api';
 import { User } from '@/types/api';
+import { isValidCNPJ } from '@/utils/validCnpj';
 
 export async function getAllOCS(token: string): Promise<{ ocs: OCS[] }> {
   try {
@@ -90,6 +90,87 @@ export async function desvincularAgricultor(token: string, id: string) {
   }
 }
 
+export async function checkEmailExistsInOCS(
+  email: string,
+  token: string,
+): Promise<boolean> {
+  try {
+    console.log(`Token usado para verificar a existência do e-mail: ${token}`);
+
+    const response = await api.get(`/api/ocs`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status === 200) {
+      const ocsList = response.data.ocs;
+      console.log(`OCS recuperadas: ${ocsList.length}`);
+
+      for (const ocs of ocsList) {
+        console.log(`Verificando e-mail da OCS: ${ocs.contato?.email}`);
+        if (ocs.contato?.email === email) {
+          console.log(`E-mail encontrado na OCS: ${ocs.contato?.email}`);
+          return true;
+        }
+      }
+
+      console.log(`E-mail não encontrado na OCS: ${email}`);
+      return false;
+    } else {
+      console.log(
+        `Falha ao recuperar OCS, código de status: ${response.status}`,
+      );
+      return false;
+    }
+  } catch (error) {
+    console.error(`Erro ao verificar a existência do e-mail na OCS: ${error}`);
+    return false;
+  }
+}
+
+export async function checkCNPJExistsInOCS(
+  cnpj: string,
+  token: string,
+): Promise<boolean> {
+  try {
+    console.log(`Token usado para verificar a existência do CNPJ: ${token}`);
+
+    const response = await api.get(`/api/ocs`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status === 200) {
+      const ocsList = response.data.ocs;
+      console.log(`OCS recuperadas: ${ocsList.length}`);
+
+      for (const ocs of ocsList) {
+        console.log(`Verificando CNPJ da OCS: ${ocs.cnpj}`);
+        if (ocs.cnpj === cnpj) {
+          console.log(`CNPJ encontrado na OCS: ${ocs.cnpj}`);
+          return true;
+        }
+      }
+
+      console.log(`CNPJ não encontrado na OCS: ${cnpj}`);
+      return false;
+    } else {
+      console.log(
+        `Falha ao recuperar OCS, código de status: ${response.status}`,
+      );
+      return false;
+    }
+  } catch (error) {
+    console.error(`Erro ao verificar a existência do CNPJ na OCS: ${error}`);
+    return false;
+  }
+}
+
+// Função para criar uma nova OCS
 export async function createOCS(
   {
     nome,
@@ -104,10 +185,38 @@ export async function createOCS(
     agricultores_id,
   }: OCS,
   token: string,
-) {
+): Promise<void> {
   try {
+    // Verificar se o e-mail já existe em outra OCS
+    if (typeof email === 'string' && email) {
+      const emailExistsInOCS = await checkEmailExistsInOCS(email, token);
+
+      if (emailExistsInOCS) {
+        throw new Error('E-mail já cadastrado em outra organização.');
+      }
+    } else {
+      throw new Error('E-mail inválido.');
+    }
+
+    // Verificar se o CNPJ é válido
+    if (!isValidCNPJ(cnpj)) {
+      throw new Error('CNPJ inválido.');
+    }
+
+    // Verificar se o CNPJ já existe em outra OCS
+    if (typeof cnpj === 'string' && cnpj) {
+      const cnpjExistsInOCS = await checkCNPJExistsInOCS(cnpj, token);
+
+      if (cnpjExistsInOCS) {
+        throw new Error('CNPJ já cadastrado em outra organização.');
+      }
+    } else {
+      throw new Error('CNPJ inválido.');
+    }
+
+    // Se o e-mail e o CNPJ não existirem, proceder com a criação da OCS
     const response = await api.post(
-      '/api/ocs',
+      `/api/ocs`,
       {
         nome,
         cnpj,
@@ -122,14 +231,25 @@ export async function createOCS(
       },
       {
         headers: {
-          authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       },
     );
-    console.log(response.data);
+
+    console.log('Nova OCS criada:', response.data);
     return response.data;
   } catch (error) {
-    throw new Error('Failed to create ocs');
+    console.error('Erro ao criar OCS:', error);
+    if (
+      error instanceof Error &&
+      (error.message === 'E-mail já cadastrado em outra organização.' ||
+        error.message === 'CNPJ já cadastrado em outra organização.' ||
+        error.message === 'CNPJ inválido.')
+    ) {
+      throw error;
+    }
+    throw new Error('Falha ao criar OCS');
   }
 }
 

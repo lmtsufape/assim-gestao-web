@@ -119,7 +119,7 @@ export default function Home() {
       await createOCS(
         {
           nome: name,
-          cnpj,
+          cnpj: cnpj,
           email: email,
           telefone: telefone,
           rua: street,
@@ -135,13 +135,23 @@ export default function Home() {
       router.back();
     } catch (error: any) {
       console.log(error);
-      const errors = error.response?.data?.errors;
-      if (errors !== undefined && errors !== null) {
-        for (const key of Object.keys(errors)) {
-          const errorMessage = errors[key][0];
-          setTimeout(() => {
+      if (
+        error instanceof Error &&
+        (error.message === 'E-mail já cadastrado em outra organização.' ||
+          error.message === 'CNPJ já cadastrado em outra organização.' ||
+          error.message === 'CNPJ inválido.')
+      ) {
+        setError(error.message);
+      } else {
+        const errors = error.response?.data?.errors;
+        if (errors !== undefined && errors !== null) {
+          for (const key of Object.keys(errors)) {
+            const errorMessage = errors[key][0];
             setError(`${errorMessage}`);
-          }, 3000);
+            return; // Para evitar que continue atualizando o estado com outras mensagens
+          }
+        } else {
+          setError('Erro ao processar a requisição.');
         }
       }
     }
@@ -316,8 +326,12 @@ export default function Home() {
           </div>
         </form>
       </div>
-      <Snackbar open={error.length > 0} autoHideDuration={6000}>
-        <Alert variant="filled" severity="error">
+      <Snackbar
+        open={error.length > 0}
+        autoHideDuration={6000}
+        onClose={() => setError('')}
+      >
+        <Alert variant="filled" severity="error" onClose={() => setError('')}>
           <AlertTitle>Erro!</AlertTitle>
           {error}
         </Alert>
