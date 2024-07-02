@@ -2,8 +2,8 @@
   overflow-y: scroll;
   overflow-x: hidden;
   border-radius: 1rem;
-  height: 300px;
- }
+  height: 500px;
+}
 
 .tableContainer {
   display: block;
@@ -11,37 +11,37 @@
 
   table {
     border-spacing: 0;
-    min-width: 100%; 
+    min-width: 100%;
 
     @media (max-width: 756px) {
       min-width: 150%;
     }
   }
-  
 
   thead {
     position: sticky;
-    top: 0px;
-    margin: 0 0 0 0;
+    top: 0;
+    margin: 0;
     background-color: #008000;
     color: white;
     height: 55px;
     z-index: 999;
+
     th {
       font-weight: 400;
-      font-size: clamp(.75rem, 3vw, 1rem);
+      font-size: clamp(0.75rem, 3vw, 1rem);
     }
   }
 
   tbody {
     tr {
       border: 1px solid pink;
-      border-color: pink;
+
       td {
         text-align: center;
         padding: 1.5rem 0;
         place-self: center;
-        font-size: clamp(.75rem, 3vw, 1rem);
+        font-size: clamp(0.75rem, 3vw, 1rem);
       }
     }
   }
@@ -51,5 +51,5 @@
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
-  place-content: end;
+  place-content: flex-end;
 }

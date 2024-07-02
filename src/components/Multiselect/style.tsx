@@ -6,8 +6,8 @@ export const StyledInputBase = styled(InputBase)`
   width: 100%;
   border-radius: 8px;
   border: 1px solid #d8d8d8;
-  padding: 0.5rem;
-  margin-top: 0.5rem;
+  padding: 0.67rem;
+  margin-top: 0.7rem;
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
   font-family: inherit;

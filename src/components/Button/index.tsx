@@ -1,5 +1,4 @@
 import React from 'react';
-
 import S from './styles.module.scss';
 
 type Props = {
@@ -25,7 +24,8 @@ const Button = ({
       style={style}
       type={type}
       data-type={dataType}
-      className={disabled ? S.disabled : S.button}
+      className={`${S.button} ${disabled ? S.disabled : ''}`}
+      disabled={disabled}
     >
       {children}
     </button>
