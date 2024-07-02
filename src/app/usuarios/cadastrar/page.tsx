@@ -14,7 +14,6 @@ import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
 import {
   createUser,
-  getAllBairros,
   getAllRoles,
   getAllBairrosByCidade,
   checkEmailExistsInUsers,
@@ -29,7 +28,6 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  CircularProgress,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { getAllCidades } from '@/services/cidades';
@@ -244,10 +242,10 @@ export default function Home() {
     fetchBairros(token!, cidadeId);
   };
 
-  const handleBairroChange = (event: SelectChangeEvent<number>) => {
+  /*  const handleBairroChange = (event: SelectChangeEvent<number>) => {
     const bairroId = event.target.value as number;
     setSelectedBairro(bairroId);
-  };
+  }; */
 
   const fetchBairros = async (token: string, cidadeId: number) => {
     try {

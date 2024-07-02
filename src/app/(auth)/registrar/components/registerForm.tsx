@@ -26,7 +26,6 @@ import {
   MenuItem,
   Select,
   FormControl,
-  InputLabel,
   SelectChangeEvent,
   FormHelperText,
 } from '@mui/material';

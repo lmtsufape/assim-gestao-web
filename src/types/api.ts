@@ -175,3 +175,13 @@ export interface Banca {
   vendas?: Venda[];
   bairros_info_entrega?: Bairro[];
 }
+
+export interface APIErrorResponse {
+  response?: {
+    data?: {
+      errors?: {
+        [key: string]: string[];
+      };
+    };
+  };
+}
