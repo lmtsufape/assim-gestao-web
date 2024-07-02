@@ -1,19 +1,23 @@
 .searchContainer {
-    display: flex;
-    align-items: center;
-    max-width: 100%; 
-    position: relative;
-  }
-  
-  .searchIconContainer {
-    position: absolute;
-    right: 0px;;
-    background-color: #008000;
-    padding: 15px;
-    border-radius: 0 4px 4px 0;
-  }
-  
-  .searchIcon {
-    color: white; 
-  }
-  
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  position: relative;
+}
+
+.searchIconContainer {
+  margin-top: -8px;
+  margin-bottom: -2px;
+  height: 56px;
+  position: absolute;
+  right: 0px;
+  background-color: #008000;
+  padding: 15px;
+  border-radius: 0 4px 4px 0;
+}
+
+.searchIcon {
+  margin-top: -4px;
+  margin-bottom: -2px;
+  color: white;
+}
