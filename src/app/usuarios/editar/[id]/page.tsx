@@ -11,7 +11,7 @@ import MultiSelect from '@/components/Multiselect';
 import { StyledSelect } from '@/components/Multiselect/style';
 
 import { getUser, getAllRoles, editUser } from '@/services';
-import { User } from '@/types/api';
+import { APIErrorResponse, User } from '@/types/api';
 import { Alert, AlertTitle, Snackbar } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 
@@ -46,7 +46,7 @@ const Home = ({ params }: { params: { id: string } }) => {
       redirect('/');
     }
     getUser(token, params.id)
-      .then((response: { user: User[] }) => {
+      .then((response: { user: User }) => {
         /*  console.log('Dados do usuário:', response.user);
         console.log('ID:', params.id); */
         setContent(response.user);
@@ -106,10 +106,11 @@ const Home = ({ params }: { params: { id: string } }) => {
       };
       await editUser(requestData, token, params.id);
       router.back();
-    } catch (error: any) {
-      const errors = error.response?.data?.errors;
+    } catch (error: unknown) {
+      const apiError = error as APIErrorResponse;
+      const errors = apiError.response?.data?.errors;
       console.log(errors);
-      if (errors !== undefined && errors !== null) {
+      if (errors) {
         for (const key of Object.keys(errors)) {
           const errorMessage = errors[key][0];
           setTimeout(() => {
@@ -117,6 +118,8 @@ const Home = ({ params }: { params: { id: string } }) => {
             window.location.reload();
           }, 3000);
         }
+      } else {
+        console.log('Unexpected error', error);
       }
     }
   };
