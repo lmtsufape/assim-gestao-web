@@ -189,7 +189,7 @@ const Home = ({ params }: { params: { id: string } }) => {
               </Link>
             </div>
             <div>
-              <h1 className={S.title}>Associações</h1>
+              <h1 className={S.title}>{content.nome}</h1>
             </div>
           </div>
         </div>
