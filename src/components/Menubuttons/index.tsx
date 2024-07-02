@@ -7,6 +7,7 @@ import { TbHomeSearch } from 'react-icons/tb';
 import { PiStorefrontLight } from 'react-icons/pi';
 
 import S from './styles.module.scss';
+import { BiSolidHome } from 'react-icons/bi';
 
 const MenuOptions = () => {
   const [role, setRole] = React.useState('');
@@ -43,6 +44,12 @@ const MenuOptions = () => {
       icon: <GrSchedules />,
       name: 'Reuniões',
       route: '/reunioes',
+      roles: ['administrador', 'secretario', 'presidente'],
+    },
+    {
+      icon: <BiSolidHome />,
+      name: 'Bairros',
+      route: '/bairros',
       roles: ['administrador', 'secretario', 'presidente'],
     },
     {
