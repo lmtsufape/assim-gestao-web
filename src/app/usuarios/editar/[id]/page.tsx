@@ -23,9 +23,7 @@ const Home = ({ params }: { params: { id: string } }) => {
   const [password, setPassword] = React.useState('');
   const [content, setContent] = React.useState<User | null>(null);
 
-  const [selectedRole, setSelectedRole] = React.useState<string | string[]>([
-    '2',
-  ]); // Pegar do usuário
+  const [selectedRole, setSelectedRole] = React.useState<string | string[]>([]);
 
   const [error, setError] = React.useState('');
 
@@ -42,9 +40,6 @@ const Home = ({ params }: { params: { id: string } }) => {
     },
   });
 
-  const selectedRoleDefault = content?.roles?.map((item) =>
-    typeof item !== 'number' && typeof item !== 'string' ? item.id : [],
-  );
   React.useEffect(() => {
     const token = localStorage.getItem('@token');
     if (!token) {
@@ -52,28 +47,34 @@ const Home = ({ params }: { params: { id: string } }) => {
     }
     getUser(token, params.id)
       .then((response: { user: User[] }) => {
-        console.log('Dados do usuário:', response.user[0]);
-        setContent(response.user[0]);
+        /*  console.log('Dados do usuário:', response.user);
+        console.log('ID:', params.id); */
+        setContent(response.user);
       })
       .catch((error: unknown) => console.log(error));
   }, [params.id]);
 
   React.useEffect(() => {
-    if (content) {
+    if (content && roles) {
       setName(content.name ?? '');
-      setEmail(content.contato?.email ?? '');
+      setEmail(content.email ?? '');
       setCpf(content.cpf ?? '');
       setTelefone(content.contato?.telefone ?? '');
       setPassword(content.password ?? '');
-      setSelectedRole(
-        content.roles?.map((item) =>
-          typeof item !== 'number' && typeof item !== 'string'
-            ? String(item.id)
+
+      // Mapeando os ids para os nomes das roles
+      const roleNames = content.roles
+        ?.map((role) =>
+          typeof role !== 'number' && typeof role !== 'string'
+            ? roles.find((r: { id: number; nome: string }) => r.id === role.id)
+                ?.nome
             : '',
-        ) ?? ['2'],
-      );
+        )
+        .filter((roleName) => roleName !== '') as string[];
+
+      setSelectedRole(roleNames ?? ['']);
     }
-  }, [content]);
+  }, [content, roles]);
 
   const handleEditRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,19 +84,28 @@ const Home = ({ params }: { params: { id: string } }) => {
         redirect('/');
       }
 
+      // Convertendo os nomes de volta para ids
+      const roleIds = (
+        Array.isArray(selectedRole) ? selectedRole : [selectedRole]
+      )
+        .map(
+          (roleName) =>
+            roles?.find(
+              (role: { id: number; nome: string }) => role.nome === roleName,
+            )?.id,
+        )
+        .filter((roleId) => roleId !== undefined) as number[];
+
       const requestData = {
         name: name ?? content?.name,
         email: email ?? content?.email,
         cpf: cpf ?? content?.cpf,
         password: password ?? content?.password,
         telefone: telefone ?? content?.contato?.telefone,
-        roles: Array.isArray(selectedRole)
-          ? selectedRole
-          : [selectedRole] || selectedRoleDefault,
+        roles: roleIds,
       };
       await editUser(requestData, token, params.id);
       router.back();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const errors = error.response?.data?.errors;
       console.log(errors);
@@ -137,12 +147,12 @@ const Home = ({ params }: { params: { id: string } }) => {
               <Input
                 name="email"
                 type="email"
-                placeholder={content?.contato?.email ?? ''}
+                placeholder={content?.email ?? ''}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div>
+            {/*  <div>
               <label htmlFor="cnpj">
                 Senha<span>*</span>
               </label>
@@ -153,7 +163,7 @@ const Home = ({ params }: { params: { id: string } }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-            </div>
+            </div> */}
             <div>
               <label htmlFor="telefone">
                 Telefone<span>*</span>
@@ -167,7 +177,7 @@ const Home = ({ params }: { params: { id: string } }) => {
                 mask="phone"
               />
             </div>
-            <div>
+            {/* <div>
               <label htmlFor="cpf">
                 CPF<span>*</span>
               </label>
@@ -179,7 +189,7 @@ const Home = ({ params }: { params: { id: string } }) => {
                 onChange={(e) => setCpf(e.target.value)}
                 mask="cpf"
               />
-            </div>
+            </div> */}
             <MultiSelect
               label="Função"
               selectedNames={selectedRole}
@@ -205,7 +215,7 @@ const Home = ({ params }: { params: { id: string } }) => {
               Voltar
             </Button>{' '}
             <Button dataType="filled" type="submit">
-              Cadastrar
+              Editar
             </Button>
           </div>
         </form>

@@ -41,7 +41,8 @@ export default function Home() {
   const [bairro, setBairro] = React.useState<Bairro[]>([]);
   const [selectedBairro, setSelectedBairro] = React.useState(0);
 
-  const [error, setError] = React.useState('');
+  const [errorMessages, setErrorMessages] = React.useState<string[]>([]);
+  const [currentError, setCurrentError] = React.useState<string | null>(null);
 
   const router = useRouter();
 
@@ -103,8 +104,38 @@ export default function Home() {
     return selectedAgricultoresIds;
   };
 
+  const validateFields = () => {
+    const errors = {
+      name: name.length >= 10 ? '' : 'Nome deve ter pelo menos 10 caracteres.',
+      email: email ? '' : 'E-mail é obrigatório.',
+      cnpj: cnpj ? '' : 'CNPJ é obrigatório.',
+      telefone: telefone ? '' : 'Telefone é obrigatório.',
+      street: street ? '' : 'Rua é obrigatória.',
+      cep: cep ? '' : 'CEP é obrigatório.',
+      number: number ? '' : 'Número é obrigatório.',
+      selectedAssociacoes: selectedAssociacoes
+        ? ''
+        : 'Associação é obrigatória.',
+      selectedAgricultores: selectedAgricultores.length
+        ? ''
+        : 'Agricultores são obrigatórios.',
+      selectedBairro: selectedBairro ? '' : 'Bairro é obrigatório.',
+    };
+
+    const errorMessages = Object.values(errors).filter((error) => error);
+    return errorMessages;
+  };
+
   const handleRegister: (e: React.FormEvent) => Promise<void> = async (e) => {
     e.preventDefault();
+
+    const validationErrors = validateFields();
+    if (validationErrors.length) {
+      setErrorMessages(validationErrors);
+      setCurrentError(validationErrors[0]);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('@token');
       if (!token) {
@@ -119,7 +150,7 @@ export default function Home() {
       await createOCS(
         {
           nome: name,
-          cnpj,
+          cnpj: cnpj,
           email: email,
           telefone: telefone,
           rua: street,
@@ -135,14 +166,40 @@ export default function Home() {
       router.back();
     } catch (error: any) {
       console.log(error);
-      const errors = error.response?.data?.errors;
-      if (errors !== undefined && errors !== null) {
-        for (const key of Object.keys(errors)) {
-          const errorMessage = errors[key][0];
-          setTimeout(() => {
-            setError(`${errorMessage}`);
-          }, 3000);
+      if (
+        error instanceof Error &&
+        (error.message === 'E-mail já cadastrado em outra organização.' ||
+          error.message === 'CNPJ já cadastrado em outra organização.' ||
+          error.message === 'CNPJ inválido.')
+      ) {
+        setErrorMessages([error.message]);
+        setCurrentError(error.message);
+      } else {
+        const errors = error.response?.data?.errors;
+        if (errors !== undefined && errors !== null) {
+          const errorList = [];
+          for (const key of Object.keys(errors)) {
+            const errorMessage = errors[key][0];
+            errorList.push(errorMessage);
+          }
+          setErrorMessages(errorList);
+          setCurrentError(errorList[0]);
+        } else {
+          setErrorMessages(['Erro ao processar a requisição.']);
+          setCurrentError('Erro ao processar a requisição.');
         }
+      }
+    }
+  };
+
+  const handleClose = () => {
+    if (currentError !== null) {
+      const nextIndex = errorMessages.indexOf(currentError) + 1;
+      if (nextIndex < errorMessages.length) {
+        setCurrentError(errorMessages[nextIndex]);
+      } else {
+        setCurrentError(null);
+        setErrorMessages([]);
       }
     }
   };
@@ -316,10 +373,14 @@ export default function Home() {
           </div>
         </form>
       </div>
-      <Snackbar open={error.length > 0} autoHideDuration={6000}>
-        <Alert variant="filled" severity="error">
+      <Snackbar
+        open={currentError !== null}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert variant="filled" severity="error" onClose={handleClose}>
           <AlertTitle>Erro!</AlertTitle>
-          {error}
+          {currentError}
         </Alert>
       </Snackbar>
     </main>
