@@ -12,19 +12,16 @@ import { StyledSelect } from '@/components/Multiselect/style';
 import MuiSelect from '@/components/Select';
 import { Snackbar, Alert, AlertTitle } from '@mui/material';
 
-import { getAllEstados } from '@/services/estado';
-import { createCidade } from '@/services/cidades';
-import { Estado } from '@/types/api';
+import { getAllCidades } from '@/services/cidades';
+import { Bairro, Estado } from '@/types/api';
+import { createBairro } from '@/services';
 
 export default function Home() {
   const [name, setName] = React.useState('');
-  const [estado, setEstado] = React.useState<Estado[]>([]);
-  const [selectedEstado, setSelectedEstado] = React.useState<string | number>(
-    '',
-  );
+  const [cidade, setCidade] = React.useState<Estado[]>([]);
+  const [selectedCidade, setSelectedCidade] = React.useState<number>(0);
 
   const router = useRouter();
-
   const [errorMessage, setErrorMessage] = React.useState('');
 
   React.useEffect(() => {
@@ -32,7 +29,6 @@ export default function Home() {
       const timer = setTimeout(() => {
         setErrorMessage('');
       }, 4000);
-
       return () => clearTimeout(timer);
     }
   }, [errorMessage]);
@@ -43,8 +39,8 @@ export default function Home() {
       redirect('/');
     }
 
-    getAllEstados(token)
-      .then((response: any) => setEstado(response))
+    getAllCidades(token)
+      .then((response: any) => setCidade(response))
       .catch((error: any) => console.log(error));
   }, []);
 
@@ -56,11 +52,12 @@ export default function Home() {
         redirect('/');
       }
 
-      const cidadeData = new FormData();
-      cidadeData.append('nome', name);
-      cidadeData.append('estado_id', selectedEstado.toString());
+      const bairroData: Partial<Bairro> = {
+        nome: name,
+        cidade_id: selectedCidade,
+      };
 
-      await createCidade(token, cidadeData);
+      await createBairro(token, bairroData);
       router.back();
     } catch (error: any) {
       console.log(error);
@@ -68,7 +65,7 @@ export default function Home() {
         setTimeout(() => {}, 4000);
       } else {
         setErrorMessage(
-          'Erro ao cadastrar cidade. Por favor, verifique os dados e tente novamente.',
+          'Erro ao cadastrar bairro. Por favor, verifique os dados e tente novamente.',
         );
       }
     }
@@ -97,11 +94,11 @@ export default function Home() {
               />
             </div>
             <MuiSelect
-              label="Estado"
-              selectedNames={selectedEstado}
-              setSelectedNames={(value) => setSelectedEstado(value as number)}
+              label="Cidade"
+              selectedNames={selectedCidade}
+              setSelectedNames={(value) => setSelectedCidade(value as number)}
             >
-              {estado?.map((item) => (
+              {cidade?.map((item) => (
                 <StyledSelect
                   key={item.id}
                   value={item.id}
