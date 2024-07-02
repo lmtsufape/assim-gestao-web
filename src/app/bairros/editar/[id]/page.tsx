@@ -12,25 +12,23 @@ import { StyledSelect } from '@/components/Multiselect/style';
 import MuiSelect from '@/components/Select';
 import { Snackbar, Alert, AlertTitle } from '@mui/material';
 
-import { getAllEstados } from '@/services/estado';
-import { getCidade, updateCidade } from '@/services/cidades';
-import { Estado } from '@/types/api';
+import { getAllCidades } from '@/services/cidades';
+import { Cidade } from '@/types/api';
 import Loader from '@/components/Loader';
+import { getBairro } from '@/services';
 
 interface Params {
   id: number;
 }
 
-interface EditCityProps {
+interface EditBairroProps {
   params: Params;
 }
 
-export default function EditCity({ params }: EditCityProps) {
+export default function EditBairro({ params }: EditBairroProps) {
   const [name, setName] = React.useState('');
-  const [estado, setEstado] = React.useState<Estado[]>([]);
-  const [selectedEstado, setSelectedEstado] = React.useState<string | number>(
-    '',
-  );
+  const [cidade, setCidade] = React.useState<Cidade[]>([]);
+  const [selectedCidade, setSelectedCidade] = React.useState<number>(0);
   const [loading, setLoading] = React.useState(true);
 
   const router = useRouter();
@@ -46,12 +44,12 @@ export default function EditCity({ params }: EditCityProps) {
 
     const fetchData = async () => {
       try {
-        const estados = await getAllEstados(token);
-        setEstado(estados);
+        const cidades = await getAllCidades(token);
+        setCidade(cidades);
 
-        const cidade = await getCidade(token, params.id);
-        setName(cidade.nome);
-        setSelectedEstado(cidade.estado_id);
+        const bairro = await getBairro(token, params.id);
+        setName(bairro.nome);
+        setSelectedCidade(bairro.cidade_id);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -62,19 +60,19 @@ export default function EditCity({ params }: EditCityProps) {
     fetchData();
   }, [params.id]);
 
-  const handleRegister: (e: React.FormEvent) => Promise<void> = async (e) => {
+  const handleUpdate: (e: React.FormEvent) => Promise<void> = async (e) => {
     e.preventDefault();
     try {
       if (!token) {
         redirect('/');
       }
 
-      const cidadeData = {
+      const bairroData = {
         nome: name,
-        estado_id: Number(selectedEstado),
+        cidade_id: selectedCidade,
       };
 
-      await updateCidade(token, params.id, cidadeData);
+      await updateBairro(token, params.id, bairroData);
       router.back();
     } catch (error: any) {
       console.log(error);
@@ -82,7 +80,7 @@ export default function EditCity({ params }: EditCityProps) {
         setTimeout(() => {}, 4000);
       } else {
         setErrorMessage(
-          'Erro ao atualizar cidade. Por favor, verifique os dados e tente novamente.',
+          'Erro ao atualizar bairro. Por favor, verifique os dados e tente novamente.',
         );
       }
     }
@@ -93,8 +91,8 @@ export default function EditCity({ params }: EditCityProps) {
   return (
     <main style={{ marginTop: '5rem' }}>
       <div className={S.container}>
-        <h1>Editar Cidade</h1>
-        <form className={S.form} onSubmit={handleRegister}>
+        <h1>Editar Bairro</h1>
+        <form className={S.form} onSubmit={handleUpdate}>
           <h3>Dados</h3>
           <section>
             <div>
@@ -110,11 +108,11 @@ export default function EditCity({ params }: EditCityProps) {
               />
             </div>
             <MuiSelect
-              label="Estado"
-              selectedNames={selectedEstado}
-              setSelectedNames={(value) => setSelectedEstado(value as number)}
+              label="Cidade"
+              selectedNames={selectedCidade}
+              setSelectedNames={(value) => setSelectedCidade(value as number)}
             >
-              {estado?.map((item) => (
+              {cidade?.map((item) => (
                 <StyledSelect
                   key={item.id}
                   value={item.id}
