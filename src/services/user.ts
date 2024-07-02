@@ -1,7 +1,92 @@
+import { isValidCPF } from '@/utils/validCpf';
 import { Role } from '../types/api';
 import { api } from './api';
 
 import { Presidente, User } from '@/types/api';
+
+export async function checkEmailExistsInUsers(
+  email: string,
+  token: string,
+): Promise<boolean> {
+  try {
+    console.log(`Token usado para verificar a existência do e-mail: ${token}`);
+
+    const response = await api.get(`/api/users`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status === 200) {
+      const userList = response.data.users;
+      console.log(`Usuários recuperados: ${userList.length}`);
+
+      for (const user of userList) {
+        console.log(`Verificando e-mail do usuário: ${user.email}`);
+        if (user.email === email) {
+          console.log(`E-mail encontrado no usuário: ${user.email}`);
+          return true;
+        }
+      }
+
+      console.log(`E-mail não encontrado no usuário: ${email}`);
+      return false;
+    } else {
+      console.log(
+        `Falha ao recuperar usuários, código de status: ${response.status}`,
+      );
+      return false;
+    }
+  } catch (error) {
+    console.error(
+      `Erro ao verificar a existência do e-mail nos usuários: ${error}`,
+    );
+    return false;
+  }
+}
+
+export async function checkCpfExistsInUsers(
+  cpf: string,
+  token: string,
+): Promise<boolean> {
+  try {
+    console.log(`Token usado para verificar a existência do CPF: ${token}`);
+
+    const response = await api.get(`/api/users`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status === 200) {
+      const userList = response.data.users;
+      console.log(`Usuários recuperados: ${userList.length}`);
+
+      for (const user of userList) {
+        console.log(`Verificando CPF do usuário: ${user.cpf}`);
+        if (user.cpf === cpf) {
+          console.log(`CPF encontrado no usuário: ${user.cpf}`);
+          return true;
+        }
+      }
+
+      console.log(`CPF não encontrado no usuário: ${cpf}`);
+      return false;
+    } else {
+      console.log(
+        `Falha ao recuperar usuários, código de status: ${response.status}`,
+      );
+      return false;
+    }
+  } catch (error) {
+    console.error(
+      `Erro ao verificar a existência do CPF nos usuários: ${error}`,
+    );
+    return false;
+  }
+}
 
 export async function createUser(
   {
@@ -15,12 +100,40 @@ export async function createUser(
     cep,
     numero,
     bairro_id,
+    complemento,
   }: User,
   token: string,
 ) {
-  const response = await api.post(
-    '/api/users',
-    {
+  try {
+    // Verificar se o e-mail já existe em outro usuário
+    if (typeof email === 'string' && email) {
+      const emailExistsInUsers = await checkEmailExistsInUsers(email, token);
+
+      if (emailExistsInUsers) {
+        throw new Error('E-mail já cadastrado em outro usuário.');
+      }
+    } else {
+      throw new Error('E-mail inválido.');
+    }
+
+    // Verificar se o CPF é válido
+    if (!isValidCPF(cpf)) {
+      throw new Error('CPF inválido.');
+    }
+
+    // Verificar se o CPF já existe em outro usuário
+    if (typeof cpf === 'string' && cpf) {
+      const cpfExistsInUsers = await checkCpfExistsInUsers(cpf, token);
+
+      if (cpfExistsInUsers) {
+        throw new Error('CPF já cadastrado em outro usuário.');
+      }
+    } else {
+      throw new Error('CPF inválido.');
+    }
+
+    // Se o e-mail e o CPF não existirem, proceder com a criação do usuário
+    const userData: User = {
       name,
       email,
       password,
@@ -31,14 +144,30 @@ export async function createUser(
       cep,
       numero,
       bairro_id,
-    },
-    {
+      complemento,
+    };
+
+    const response = await api.post('/api/users', userData, {
       headers: {
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
-    },
-  );
-  return response.data;
+    });
+
+    console.log('Novo usuário criado:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao criar usuário:', error);
+    if (
+      error instanceof Error &&
+      (error.message === 'E-mail já cadastrado em outro usuário.' ||
+        error.message === 'CPF já cadastrado em outro usuário.' ||
+        error.message === 'CPF inválido.')
+    ) {
+      throw error;
+    }
+    throw new Error('Falha ao criar usuário');
+  }
 }
 
 export async function signIn(email: string, password: string) {

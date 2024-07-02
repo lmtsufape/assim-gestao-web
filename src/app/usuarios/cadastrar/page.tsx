@@ -1,7 +1,7 @@
 'use client';
 
 import { redirect, useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
 
 import S from './styles.module.scss';
 
@@ -10,42 +10,81 @@ import Input from '@/components/Input';
 import MultiSelect from '@/components/Multiselect';
 import { StyledSelect } from '@/components/Multiselect/style';
 import MuiSelect from '@/components/Select';
+import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
-import { createUser, getAllBairros, getAllRoles } from '@/services';
-import { Bairro } from '@/types/api';
-import { Alert, AlertTitle, Snackbar } from '@mui/material';
+import {
+  createUser,
+  getAllBairros,
+  getAllRoles,
+  getAllBairrosByCidade,
+  checkEmailExistsInUsers,
+  checkCpfExistsInUsers,
+} from '@/services';
+import { Bairro, Cidade } from '@/types/api';
+import {
+  Alert,
+  AlertTitle,
+  Snackbar,
+  FormControl,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  CircularProgress,
+} from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
+import { getAllCidades } from '@/services/cidades';
+import { isValidCPF } from '@/utils/validCpf';
+import Loader from '@/components/Loader';
 
 export default function Home() {
-  const [error, setError] = React.useState('');
+  const [errorMessages, setErrorMessages] = React.useState<string[]>([]);
+  const [currentError, setCurrentError] = React.useState<string | null>(null);
+  const [confirmationMessage, setConfirmationMessage] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [cpf, setCpf] = React.useState('');
   const [telefone, setTelefone] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  const [selectedCidade, setSelectedCidade] = useState<number>(1);
 
   const [street, setStreet] = React.useState('');
   const [cep, setCEP] = React.useState('');
   const [number, setNumber] = React.useState('');
+  const [complemento, setComplemento] = React.useState('');
 
   const [bairro, setBairro] = React.useState<Bairro[]>([]);
-  const [selectedBairro, setSelectedBairro] = React.useState(1);
+  const [selectedBairro, setSelectedBairro] = React.useState<number>(0);
+  const [cidades, setCidades] = useState<Cidade[]>([]);
 
   const [selectedRole, setSelectedRole] = React.useState<string | string[]>([]);
-
-  const [confirmationMessage, setConfirmationMessage] = React.useState('');
 
   const router = useRouter();
 
   React.useEffect(() => {
     const token = localStorage.getItem('@token');
+    fetchCidades(token!);
+    fetchBairros(token!, 1);
     if (!token) {
       redirect('/');
     }
-    getAllBairros(token)
-      .then((response: { bairros: Bairro[] }) => setBairro(response.bairros))
-      .catch((error: unknown) => console.log(error));
   }, []);
+
+  const fetchCidades = async (token: string) => {
+    try {
+      const cidades = await getAllCidades(token);
+      setCidades(cidades);
+    } catch (error) {
+      console.error('Failed to fetch cidades:', error);
+    }
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const { data: roles } = useQuery({
     queryKey: ['roles'],
@@ -63,12 +102,68 @@ export default function Home() {
     return selectedRoleObject?.id;
   };
 
+  const validateFields = () => {
+    const errors = [];
+
+    if (name.length < 3) {
+      errors.push('O campo nome deve ter no mínimo 3 caracteres.');
+    }
+    if (!email) {
+      errors.push('O campo e-mail é obrigatório.');
+    }
+    if (!cpf) {
+      errors.push('O campo CPF é obrigatório.');
+    } else if (!isValidCPF(cpf)) {
+      errors.push('O CPF é inválido.');
+    }
+    if (!telefone) {
+      errors.push('O campo telefone é obrigatório.');
+    }
+    if (!password) {
+      errors.push('O campo senha é obrigatório.');
+    }
+    if (!street) {
+      errors.push('O campo rua é obrigatório.');
+    }
+    if (!cep) {
+      errors.push('O campo CEP é obrigatório.');
+    }
+    if (!number) {
+      errors.push('O campo número é obrigatório.');
+    }
+    if (!selectedBairro) {
+      errors.push('O campo bairro é obrigatório.');
+    }
+
+    return errors;
+  };
+
   const handleRegister: (e: React.FormEvent) => Promise<void> = async (e) => {
     e.preventDefault();
+
+    const validationErrors = validateFields();
+    if (validationErrors.length) {
+      setErrorMessages(validationErrors);
+      setCurrentError(validationErrors[0]);
+      return;
+    }
+
+    setLoading(true);
+
     try {
       const token = localStorage.getItem('@token');
       if (!token) {
         redirect('/');
+      }
+
+      const emailExists = await checkEmailExistsInUsers(email, token!);
+      if (emailExists) {
+        throw new Error('E-mail já cadastrado em outro usuário.');
+      }
+
+      const cpfExists = await checkCpfExistsInUsers(cpf, token!);
+      if (cpfExists) {
+        throw new Error('CPF já cadastrado em outro usuário.');
       }
 
       const selectedRoleIds = Array.isArray(selectedRole)
@@ -89,26 +184,81 @@ export default function Home() {
           cep: cep,
           numero: number,
           bairro_id: selectedBairro,
+          complemento: complemento,
         },
         token,
       );
+
+      setLoading(false);
       setConfirmationMessage('Usuário cadastrado com sucesso');
       setTimeout(() => {
         setConfirmationMessage('');
+        router.push('/menu');
       }, 4000);
 
-      router.back();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      const errors = error.response?.data?.errors;
-      if (errors !== undefined && errors !== null) {
-        for (const key of Object.keys(errors)) {
-          const errorMessage = errors[key][0];
-          setTimeout(() => {
-            setError(`${errorMessage}`);
-          }, 4000);
+      setLoading(false);
+      if (
+        error instanceof Error &&
+        (error.message === 'E-mail já cadastrado em outro usuário.' ||
+          error.message === 'CPF já cadastrado em outro usuário.')
+      ) {
+        setErrorMessages([error.message]);
+        setCurrentError(error.message);
+      } else {
+        const errors = error.response?.data?.errors;
+        if (errors !== undefined && errors !== null) {
+          const errorList = [];
+          for (const key of Object.keys(errors)) {
+            const errorMessage = errors[key][0];
+            errorList.push(errorMessage);
+          }
+          setErrorMessages(errorList);
+          setCurrentError(errorList[0]);
+        } else {
+          setErrorMessages(['Erro ao processar a requisição.']);
+          setCurrentError('Erro ao processar a requisição.');
         }
       }
+    }
+  };
+
+  const handleClose = () => {
+    if (currentError !== null) {
+      const nextIndex = errorMessages.indexOf(currentError) + 1;
+      if (nextIndex < errorMessages.length) {
+        setCurrentError(errorMessages[nextIndex]);
+      } else {
+        setCurrentError(null);
+        setErrorMessages([]);
+      }
+    }
+  };
+
+  const handleCidadeChange = (event: SelectChangeEvent<number>) => {
+    const token = localStorage.getItem('@token');
+
+    const cidadeId = event.target.value as number;
+    setSelectedCidade(cidadeId);
+    fetchBairros(token!, cidadeId);
+  };
+
+  const handleBairroChange = (event: SelectChangeEvent<number>) => {
+    const bairroId = event.target.value as number;
+    setSelectedBairro(bairroId);
+  };
+
+  const fetchBairros = async (token: string, cidadeId: number) => {
+    try {
+      const { bairros } = await getAllBairrosByCidade(token, cidadeId);
+      setBairro(bairros);
+      if (bairros.length > 0) {
+        setSelectedBairro(bairros[0].id); // Setar o primeiro bairro como selecionado
+      }
+      console.log('Bairros fetched:', bairros);
+    } catch (error) {
+      console.error('Failed to fetch bairros:', error);
     }
   };
 
@@ -147,16 +297,25 @@ export default function Home() {
               />
             </div>
             <div>
-              <label htmlFor="cnpj">
+              <label htmlFor="password">
                 Senha<span>*</span>
               </label>
-              <Input
-                name="password"
-                type="password"
-                placeholder="*******"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className={S.passwordInput}>
+                <Input
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="*******"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={toggleShowPassword}
+                  className={S.togglePasswordButton}
+                >
+                  {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
+                </button>
+              </div>
             </div>
             <div>
               <label htmlFor="telefone">
@@ -227,6 +386,28 @@ export default function Home() {
                 mask="zipCode"
               />
             </div>
+            <div>
+              <label htmlFor="cidade-label">
+                Cidade<span>*</span>
+              </label>
+              <FormControl fullWidth>
+                <Select
+                  style={{ borderRadius: '8px' }}
+                  labelId="cidade-label"
+                  id="cidade"
+                  value={selectedCidade}
+                  placeholder="Cidade"
+                  onChange={handleCidadeChange}
+                  label="Cidade"
+                >
+                  {cidades.map((cidade) => (
+                    <MenuItem key={cidade.id} value={cidade.id}>
+                      {cidade.nome}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
             <MuiSelect
               label="Bairro"
               selectedNames={selectedBairro}
@@ -242,6 +423,7 @@ export default function Home() {
                 </StyledSelect>
               ))}
             </MuiSelect>
+
             <div>
               <label htmlFor="number">
                 Número<span>*</span>
@@ -252,6 +434,17 @@ export default function Home() {
                 placeholder="Número"
                 value={number}
                 onChange={(e) => setNumber(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="complemento">Complemento</label>
+              <Input
+                name="complemento"
+                type="text"
+                placeholder="Complemento"
+                value={complemento}
+                onChange={(e) => setComplemento(e.target.value)}
               />
             </div>
           </section>
@@ -269,14 +462,24 @@ export default function Home() {
           </div>
         </form>
       </div>
-      <Snackbar open={error.length > 0} autoHideDuration={6000}>
-        <Alert variant="filled" severity="error">
+      {loading && (
+        <div className={S.loaderContainer}>
+          <div className={S.loaderBackdrop}></div>
+          <Loader />
+        </div>
+      )}
+      <Snackbar
+        open={currentError !== null}
+        autoHideDuration={1000}
+        onClose={handleClose}
+      >
+        <Alert variant="filled" severity="error" onClose={handleClose}>
           <AlertTitle>Erro!</AlertTitle>
-          {error}
+          {currentError}
         </Alert>
       </Snackbar>
       {confirmationMessage && (
-        <Snackbar open={confirmationMessage.length > 0} autoHideDuration={6000}>
+        <Snackbar open={confirmationMessage.length > 0} autoHideDuration={500}>
           <Alert variant="filled" severity="success">
             <AlertTitle>Sucesso!</AlertTitle>
             {confirmationMessage}

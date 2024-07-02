@@ -10,6 +10,7 @@ export interface User {
   numero?: string;
   cep?: string;
   bairro_id?: number;
+  complemento?: string;
   roles?:
     | {
         id: number;

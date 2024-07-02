@@ -125,6 +125,7 @@ const RegisterForm = () => {
           cep,
           numero: number,
           bairro_id: selectedBairro,
+          complemento: complemento,
         },
         token!,
       );
@@ -226,7 +227,9 @@ const RegisterForm = () => {
         </div>
         <h3>Endereço</h3>
         <div>
-          <InputLabel id="cidade-label">Cidade</InputLabel>
+          <label htmlFor="cidade-label">
+            Cidade<span>*</span>
+          </label>
           <FormControl fullWidth>
             <Select
               style={{ borderRadius: '8px' }}

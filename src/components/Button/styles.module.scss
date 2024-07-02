@@ -34,11 +34,9 @@
 }
 
 .disabled {
-  border-radius: 10px;
-  padding: clamp(0.2rem, 6vw, 0.5rem) clamp(2rem, 6vw, 3.5rem);
-  border: none;
   cursor: not-allowed;
-  font-size: clamp(0.75rem, 6vw, 0.875rem);
+
+  opacity: 0.5;
 }
 
 .disabled[data-type='transparent'],
@@ -48,4 +46,60 @@
   &:hover {
     background-color: #86868625;
   }
+}
+
+.tableWrapper {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  border-radius: 1rem;
+  height: 500px;
+}
+
+.tableContainer {
+  display: block;
+  max-width: 1280px;
+
+  table {
+    border-spacing: 0;
+    min-width: 100%;
+
+    @media (max-width: 756px) {
+      min-width: 150%;
+    }
+  }
+
+  thead {
+    position: sticky;
+    top: 0;
+    margin: 0;
+    background-color: #008000;
+    color: white;
+    height: 55px;
+    z-index: 999;
+
+    th {
+      font-weight: 400;
+      font-size: clamp(0.75rem, 3vw, 1rem);
+    }
+  }
+
+  tbody {
+    tr {
+      border: 1px solid pink;
+
+      td {
+        text-align: center;
+        padding: 1.5rem 0;
+        place-self: center;
+        font-size: clamp(0.75rem, 3vw, 1rem);
+      }
+    }
+  }
+}
+
+.buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  place-content: flex-end;
 }
