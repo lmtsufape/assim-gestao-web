@@ -15,7 +15,7 @@ import { Snackbar, Alert, AlertTitle } from '@mui/material';
 import { getAllCidades } from '@/services/cidades';
 import { Cidade } from '@/types/api';
 import Loader from '@/components/Loader';
-import { getBairro } from '@/services';
+import { getBairro, updateBairro } from '@/services/bairro';
 
 interface Params {
   id: number;
