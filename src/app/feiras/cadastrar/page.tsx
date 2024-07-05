@@ -20,9 +20,12 @@ import {
   TextField,
   SelectChangeEvent,
 } from '@mui/material';
-import { getAllBairros } from '@/services';
+import { getAllAssociacoes, getAllBairros } from '@/services';
 import { createFeira } from '@/services/feiras';
 import { Bairro } from '@/types/api';
+import { useQuery } from '@tanstack/react-query';
+import MuiSelect from '@/components/Select';
+import { StyledSelect } from '@/components/Multiselect/style';
 
 const diasDaSemana = [
   'domingo',
@@ -37,6 +40,7 @@ const diasDaSemana = [
 export default function CreateFeira() {
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
+  const [selectedAssociacoes, setSelectedAssociacoes] = React.useState(1);
   const [diasSelecionados, setDiasSelecionados] = useState<string[]>([]);
   const [horariosFuncionamento, setHorariosFuncionamento] = useState<{
     [key: string]: [string, string];
@@ -56,6 +60,17 @@ export default function CreateFeira() {
       return () => clearTimeout(timer);
     }
   }, [errorMessage]);
+
+  const { data: associacoes } = useQuery({
+    queryKey: ['associacoes'],
+    queryFn: () => {
+      const token = localStorage.getItem('@token');
+      if (token) {
+        return getAllAssociacoes(token);
+      }
+      return null;
+    },
+  });
 
   useEffect(() => {
     const token = localStorage.getItem('@token');
@@ -83,7 +98,7 @@ export default function CreateFeira() {
         'horarios_funcionamento',
         JSON.stringify(horariosFuncionamento),
       );
-      formData.append('associacao_id', '1');
+      formData.append('associacao_id', selectedAssociacoes.toString());
       if (selectedBairro)
         formData.append('bairro_id', selectedBairro.toString());
 
@@ -142,67 +157,6 @@ export default function CreateFeira() {
               />
             </div>
             <div>
-              <label htmlFor="dias_funcionamento">
-                Dias de Funcionamento<span>*</span>
-              </label>
-              <FormControl fullWidth>
-                <InputLabel id="dias-label">Selecione os dias</InputLabel>
-                <Select
-                  labelId="dias-label"
-                  id="dias_funcionamento"
-                  multiple
-                  value={diasSelecionados}
-                  onChange={handleDiasChange}
-                  input={<OutlinedInput label="Selecione os dias" />}
-                  renderValue={(selected) => (selected as string[]).join(', ')}
-                >
-                  {diasDaSemana.map((dia) => (
-                    <MenuItem key={dia} value={dia}>
-                      <Checkbox checked={diasSelecionados.includes(dia)} />
-                      <ListItemText primary={dia} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </div>
-            {diasSelecionados.map((dia) => (
-              <div key={dia}>
-                <label>
-                  Horários de {dia.charAt(0).toUpperCase() + dia.slice(1)}:
-                </label>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <TextField
-                    label="Início"
-                    type="time"
-                    value={horariosFuncionamento[dia]?.[0] || ''}
-                    onChange={(e) =>
-                      handleHorarioChange(dia, 0, e.target.value)
-                    }
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    inputProps={{
-                      step: 300,
-                    }}
-                  />
-                  <TextField
-                    label="Fim"
-                    type="time"
-                    value={horariosFuncionamento[dia]?.[1] || ''}
-                    onChange={(e) =>
-                      handleHorarioChange(dia, 1, e.target.value)
-                    }
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    inputProps={{
-                      step: 300,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-            <div>
               <label htmlFor="bairro">
                 Bairro<span>*</span>
               </label>
@@ -222,7 +176,88 @@ export default function CreateFeira() {
                   ))}
                 </Select>
               </FormControl>
+
+              <div>
+                <label htmlFor="dias_funcionamento">
+                  Dias de Funcionamento<span>*</span>
+                </label>
+                <FormControl fullWidth>
+                  <InputLabel id="dias-label">Selecione os dias</InputLabel>
+                  <Select
+                    labelId="dias-label"
+                    id="dias_funcionamento"
+                    multiple
+                    value={diasSelecionados}
+                    onChange={handleDiasChange}
+                    input={<OutlinedInput label="Selecione os dias" />}
+                    renderValue={(selected) =>
+                      (selected as string[]).join(', ')
+                    }
+                  >
+                    {diasDaSemana.map((dia) => (
+                      <MenuItem key={dia} value={dia}>
+                        <Checkbox checked={diasSelecionados.includes(dia)} />
+                        <ListItemText primary={dia} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </div>
+              {diasSelecionados.map((dia) => (
+                <div key={dia}>
+                  <label>
+                    Horários de {dia.charAt(0).toUpperCase() + dia.slice(1)}:
+                  </label>
+                  <div
+                    style={{ display: 'flex', gap: '1rem', marginTop: '10px' }}
+                  >
+                    <TextField
+                      label="Início"
+                      type="time"
+                      value={horariosFuncionamento[dia]?.[0] || ''}
+                      onChange={(e) =>
+                        handleHorarioChange(dia, 0, e.target.value)
+                      }
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      inputProps={{
+                        step: 300,
+                      }}
+                    />
+                    <TextField
+                      label="Fim"
+                      type="time"
+                      value={horariosFuncionamento[dia]?.[1] || ''}
+                      onChange={(e) =>
+                        handleHorarioChange(dia, 1, e.target.value)
+                      }
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      inputProps={{
+                        step: 300,
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
+            <MuiSelect
+              label="Associação"
+              selectedNames={selectedAssociacoes}
+              setSelectedNames={setSelectedAssociacoes}
+            >
+              {associacoes?.map((item) => (
+                <StyledSelect
+                  key={item.id}
+                  value={item.id}
+                  sx={{ justifyContent: 'space-between' }}
+                >
+                  {item.nome}
+                </StyledSelect>
+              ))}
+            </MuiSelect>
           </section>
           <div className={S.wrapperButtons}>
             <Button

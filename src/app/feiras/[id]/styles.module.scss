@@ -1,0 +1,93 @@
+.main {
+  margin-top: 10rem;
+  align-items: center;
+}
+
+.container {
+  display: flex;
+  padding: 1.5rem 1rem;
+  margin: 0 auto;
+  align-items: center;
+  width: 70%;
+  justify-content: center;
+  flex-direction: column;
+  
+    hr {
+        margin-bottom: 2rem;
+        border-color: rgba(240, 255, 255, 0.623);
+    }
+
+    .back {
+      justify-content: flex-start;
+    }
+}
+
+.title {
+  color: #005247;
+  font-weight: bold; 
+  justify-content: center;
+  padding: 20px;
+}
+
+.link{
+  text-decoration: none;
+  appearance: none;
+  color:#005247;
+}
+
+.back{
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+
+.header {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    place-content: center;
+    flex-wrap: wrap;
+
+    button {
+        width: fit-content;
+        height: fit-content;
+    }
+}
+
+.content {
+  background: #fff;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
+  padding: 1.5rem 2rem;
+  border-radius: 20px;
+  width: 100%;
+
+  h3 {
+    font-size: .75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
+  h2{
+    font-size: 20px;
+    padding: 10px;
+    padding-left: 0;
+    color: #008000;
+    margin-bottom: 10px;
+  }
+
+  .editButton{
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  p {
+    color: #2b2b2b;
+    margin-bottom: 2rem;
+  }
+}
+
+

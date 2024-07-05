@@ -187,7 +187,6 @@ export async function createOCS(
   token: string,
 ): Promise<void> {
   try {
-    // Verificar se o e-mail já existe em outra OCS
     if (typeof email === 'string' && email) {
       const emailExistsInOCS = await checkEmailExistsInOCS(email, token);
 
@@ -198,12 +197,10 @@ export async function createOCS(
       throw new Error('E-mail inválido.');
     }
 
-    // Verificar se o CNPJ é válido
     if (!isValidCNPJ(cnpj)) {
       throw new Error('CNPJ inválido.');
     }
 
-    // Verificar se o CNPJ já existe em outra OCS
     if (typeof cnpj === 'string' && cnpj) {
       const cnpjExistsInOCS = await checkCNPJExistsInOCS(cnpj, token);
 
@@ -214,7 +211,6 @@ export async function createOCS(
       throw new Error('CNPJ inválido.');
     }
 
-    // Se o e-mail e o CNPJ não existirem, proceder com a criação da OCS
     const response = await api.post(
       `/api/ocs`,
       {

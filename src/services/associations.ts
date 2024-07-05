@@ -20,14 +20,14 @@ export const getAllAssociacoes = async (
 export async function getAssociacao(
   token: string,
   id: string,
-): Promise<{ data: Associacao[] }> {
+): Promise<Associacao> {
   try {
     const response = await api.get(`/api/associacoes/${id}`, {
       headers: {
         authorization: `Bearer ${token}`,
       },
     });
-    return response.data;
+    return response.data.associacao;
   } catch (error) {
     throw new Error('Erro ao buscar associação.');
   }
