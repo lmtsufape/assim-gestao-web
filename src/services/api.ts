@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const BASE_URL = 'https://comerciovidaagroecologica.ufape.edu.br';
+export const BASE_URL = 'https://comercioassim.ufape.edu.br';
 
 axios.defaults.withCredentials = true;
 

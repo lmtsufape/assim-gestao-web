@@ -10,12 +10,18 @@ import Button from '@/components/Button';
 import Input from '@/components/Input';
 
 import { signIn } from '@/services/user';
+import {
+  MdManageAccounts,
+  MdVisibility,
+  MdVisibilityOff,
+} from 'react-icons/md';
 import { Alert, AlertTitle, Snackbar } from '@mui/material';
 
 export const LoginForm = () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,15 +53,28 @@ export const LoginForm = () => {
             ) => setEmail((e.target as HTMLInputElement).value)}
           />
         </div>
-        <div>
+        <div style={{ position: 'relative' }}>
           <label htmlFor="password">Senha</label>
           <Input
             placeholder="*********"
             name="password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             value={password}
             onChange={(e: any) => setPassword(e.target.value)}
           />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              right: '0.5rem',
+              top: '65%',
+              transform: 'translateY(-50%)',
+              cursor: 'pointer',
+              color: '#666',
+            }}
+          >
+            {showPassword ? <MdVisibilityOff /> : <MdVisibility />}
+          </span>
         </div>
         <div className={S.links}>
           <Link href="/recuperar-senha">Esqueceu a senha?</Link>

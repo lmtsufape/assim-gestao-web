@@ -87,27 +87,11 @@ const Navbar = () => {
               />
               <h1>Gestão</h1>
             </Box>
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: { xs: 'flex', md: 'none' },
-                placeContent: 'end',
-              }}
-            >
-              <IconButton
-                size="large"
-                aria-label="opções de páginas de navegação"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleOpenProfileMenu}
-              >
-                <BiMenu className={styles.menu} />
-              </IconButton>
-            </Box>
+
             {params !== '/' && !params.includes('/registrar') && (
               <Box
                 sx={{
-                  display: { xs: 'none', md: 'flex' },
+                  display: { md: 'flex' },
                   alignItems: 'center',
                   marginLeft: 'auto',
                 }}

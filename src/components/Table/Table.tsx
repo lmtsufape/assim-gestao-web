@@ -39,6 +39,17 @@ const TableView = ({ data, columns }: TableViewProps) => {
       globalFilter: query,
     },
     onGlobalFilterChange: setQuery,
+    initialState: {
+      sorting: [
+        {
+          id: 'id',
+          desc: true,
+        },
+      ],
+      pagination: {
+        pageSize: 50,
+      },
+    },
   });
 
   return (
