@@ -9,6 +9,7 @@ import { BsInfoCircle } from 'react-icons/bs';
 
 import S from './styles.module.scss';
 
+import ActionsMenu from '@/components/ActionsMenu';
 import Button from '@/components/Button';
 import StyledLink from '@/components/Link';
 import Loader from '@/components/Loader';
@@ -37,6 +38,20 @@ export default function Cidades() {
   const handleClose = () => setValue(0);
   const [token, setToken] = React.useState('');
   const [infoModalOpen, setInfoModalOpen] = React.useState(false);
+  const [textResponsive, setTextResponsive] = React.useState(
+    'Adicionar Nova Cidade',
+  );
+
+  React.useEffect(() => {
+    const updateText = () => {
+      setTextResponsive(
+        window.innerWidth < 825 ? 'Adicionar' : 'Adicionar Nova Cidade',
+      );
+    };
+    window.addEventListener('resize', updateText);
+    updateText();
+    return () => window.removeEventListener('resize', updateText);
+  }, []);
 
   React.useEffect(() => {
     const token = localStorage.getItem('@token');
@@ -93,7 +108,13 @@ export default function Cidades() {
     },
     {
       header: () => (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           Ações
           <Tooltip title="Clique aqui para informações sobre os ícones">
             <IconButton
@@ -109,29 +130,50 @@ export default function Cidades() {
       accessorKey: 'id',
       cell: (info: any) => {
         const value = info.getValue();
+
+        const cidadesActions = [
+          {
+            icon: <BiSolidEditAlt style={{ marginRight: 8 }} />,
+            text: 'Editar',
+            href: `/cidades/editar/${value}`,
+          },
+          {
+            icon: <BiSolidTrashAlt style={{ marginRight: 8, color: 'red' }} />,
+            text: 'Remover',
+            onClick: () => setValue(value),
+            color: 'red',
+          },
+        ];
+
         return (
-          <ul className={S.action} role="list">
-            <li>
-              <Link href={'/cidades/editar/' + value}>
-                <Tooltip title="Editar">
-                  <IconButton aria-label="editar" size="small">
-                    <BiSolidEditAlt />
-                  </IconButton>
-                </Tooltip>
-              </Link>
-            </li>
-            <li>
-              <Tooltip title="Remover">
-                <IconButton
-                  onClick={() => setValue(value)}
-                  aria-label="Deletar"
-                  size="small"
-                >
-                  <BiSolidTrashAlt />
-                </IconButton>
-              </Tooltip>
-            </li>
-          </ul>
+          <div className={S.action}>
+            {window.innerWidth > 768 ? (
+              <ul className={S.action} role="list">
+                <li>
+                  <Link href={'/cidades/editar/' + value}>
+                    <Tooltip title="Editar">
+                      <IconButton aria-label="editar" size="small">
+                        <BiSolidEditAlt />
+                      </IconButton>
+                    </Tooltip>
+                  </Link>
+                </li>
+                <li>
+                  <Tooltip title="Remover">
+                    <IconButton
+                      onClick={() => setValue(value)}
+                      aria-label="Deletar"
+                      size="small"
+                    >
+                      <BiSolidTrashAlt />
+                    </IconButton>
+                  </Tooltip>
+                </li>
+              </ul>
+            ) : (
+              <ActionsMenu actions={cidadesActions} />
+            )}
+          </div>
         );
       },
     },
@@ -154,7 +196,7 @@ export default function Cidades() {
               <StyledLink
                 href="cidades/cadastrar"
                 data-type="filled"
-                text="Adicionar Nova Cidade"
+                text={textResponsive}
               />
             </div>
           </div>

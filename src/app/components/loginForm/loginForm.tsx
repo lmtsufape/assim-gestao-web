@@ -10,11 +10,7 @@ import Button from '@/components/Button';
 import Input from '@/components/Input';
 
 import { signIn } from '@/services/user';
-import {
-  MdManageAccounts,
-  MdVisibility,
-  MdVisibilityOff,
-} from 'react-icons/md';
+import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import { Alert, AlertTitle, Snackbar } from '@mui/material';
 
 export const LoginForm = () => {

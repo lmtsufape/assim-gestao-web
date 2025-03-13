@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
-import { BiMenu } from 'react-icons/bi';
 
 import styles from './styles.module.scss';
 
