@@ -9,6 +9,7 @@ import { BsInfoCircle } from 'react-icons/bs';
 
 import S from './styles.module.scss';
 
+import ActionsMenu from '@/components/ActionsMenu';
 import Button from '@/components/Button';
 import StyledLink from '@/components/Link';
 import Loader from '@/components/Loader';
@@ -37,6 +38,20 @@ export default function Bairros() {
   const handleClose = () => setValue(0);
   const [token, setToken] = React.useState('');
   const [infoModalOpen, setInfoModalOpen] = React.useState(false);
+  const [textResponsive, setTextResponsive] = React.useState(
+    'Adicionar Novo Bairro',
+  );
+
+  React.useEffect(() => {
+    const updateText = () => {
+      setTextResponsive(
+        window.innerWidth < 825 ? 'Adicionar' : 'Adicionar Novo Bairro',
+      );
+    };
+    window.addEventListener('resize', updateText);
+    updateText();
+    return () => window.removeEventListener('resize', updateText);
+  }, []);
 
   React.useEffect(() => {
     const token = localStorage.getItem('@token');
@@ -94,7 +109,13 @@ export default function Bairros() {
     },
     {
       header: () => (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           Ações
           <Tooltip title="Clique aqui para informações sobre os ícones">
             <IconButton
@@ -110,29 +131,49 @@ export default function Bairros() {
       accessorKey: 'id',
       cell: (info: any) => {
         const value = info.getValue();
+        const bairrosActions = [
+          {
+            icon: <BiSolidEditAlt style={{ marginRight: 8 }} />,
+            text: 'Editar',
+            href: `/bairros/editar/${value}`,
+          },
+          {
+            icon: <BiSolidTrashAlt style={{ marginRight: 8, color: 'red' }} />,
+            text: 'Remover',
+            onClick: () => setValue(value),
+            color: 'red',
+          },
+        ];
+
         return (
-          <ul className={S.action} role="list">
-            <li>
-              <Link href={'/bairros/editar/' + value}>
-                <Tooltip title="Editar">
-                  <IconButton aria-label="editar" size="small">
-                    <BiSolidEditAlt />
-                  </IconButton>
-                </Tooltip>
-              </Link>
-            </li>
-            <li>
-              <Tooltip title="Remover">
-                <IconButton
-                  onClick={() => setValue(value)}
-                  aria-label="Deletar"
-                  size="small"
-                >
-                  <BiSolidTrashAlt />
-                </IconButton>
-              </Tooltip>
-            </li>
-          </ul>
+          <div className={S.action}>
+            {window.innerWidth > 768 ? (
+              <ul className={S.action} role="list">
+                <li>
+                  <Link href={'/bairros/editar/' + value}>
+                    <Tooltip title="Editar">
+                      <IconButton aria-label="editar" size="small">
+                        <BiSolidEditAlt />
+                      </IconButton>
+                    </Tooltip>
+                  </Link>
+                </li>
+                <li>
+                  <Tooltip title="Remover">
+                    <IconButton
+                      onClick={() => setValue(value)}
+                      aria-label="Deletar"
+                      size="small"
+                    >
+                      <BiSolidTrashAlt />
+                    </IconButton>
+                  </Tooltip>
+                </li>
+              </ul>
+            ) : (
+              <ActionsMenu actions={bairrosActions} />
+            )}
+          </div>
         );
       },
     },
@@ -155,7 +196,7 @@ export default function Bairros() {
               <StyledLink
                 href="bairros/cadastrar"
                 data-type="filled"
-                text="Adicionar Novo Bairro"
+                text={textResponsive}
               />
             </div>
           </div>

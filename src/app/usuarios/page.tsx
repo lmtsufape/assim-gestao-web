@@ -9,6 +9,7 @@ import { BsFillEyeFill, BsInfoCircle } from 'react-icons/bs';
 
 import S from './styles.module.scss';
 
+import ActionsMenu from '@/components/ActionsMenu';
 import Button from '@/components/Button';
 import StyledLink from '@/components/Link';
 import Loader from '@/components/Loader';
@@ -36,6 +37,17 @@ export default function Home() {
   const [token, setToken] = React.useState('');
   const handleClose = () => setValue(0);
   const [infoModalOpen, setInfoModalOpen] = React.useState(false);
+
+  const [textResponsive, setTextResponsive] = React.useState('Criar Usuário');
+
+  React.useEffect(() => {
+    const updateText = () => {
+      setTextResponsive(window.innerWidth < 400 ? 'Criar' : 'Criar Usuário');
+    };
+    window.addEventListener('resize', updateText);
+    updateText();
+    return () => window.removeEventListener('resize', updateText);
+  });
 
   const { data, refetch, isLoading, isError, error } = useQuery({
     queryKey: ['users'],
@@ -78,7 +90,13 @@ export default function Home() {
     },
     {
       header: () => (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           Ações
           <Tooltip title="Clique nos ícones para visualizar, editar ou remover">
             <IconButton
@@ -94,38 +112,64 @@ export default function Home() {
       accessorKey: 'id',
       cell: (info: any) => {
         const value = info.getValue();
+
+        const usuariosActions = [
+          {
+            icon: <BsFillEyeFill style={{ marginRight: 8 }} />,
+            text: 'Visualizar',
+            href: `usuarios/${value}`,
+          },
+          {
+            icon: <BiSolidEditAlt style={{ marginRight: 8 }} />,
+            text: 'Editar',
+            href: `usuarios/editar/${value}`,
+          },
+          {
+            icon: <BiSolidTrashAlt style={{ marginRight: 8, color: 'red' }} />,
+            text: 'Remover',
+            onClick: () => setValue(value),
+            color: 'red',
+          },
+        ];
+
         return (
-          <ul className={S.action} role="list">
-            <li>
-              <Link href={'usuarios/' + value}>
-                <Tooltip title="Visualizar">
-                  <IconButton aria-label="visualizar" size="small">
-                    <BsFillEyeFill />
-                  </IconButton>
-                </Tooltip>
-              </Link>
-            </li>
-            <li>
-              <Link href={'usuarios/editar/' + value}>
-                <Tooltip title="Editar">
-                  <IconButton aria-label="editar" size="small">
-                    <BiSolidEditAlt />
-                  </IconButton>
-                </Tooltip>
-              </Link>
-            </li>
-            <li>
-              <Tooltip title="Remover">
-                <IconButton
-                  onClick={() => setValue(value)}
-                  aria-label="Deletar"
-                  size="small"
-                >
-                  <BiSolidTrashAlt />
-                </IconButton>
-              </Tooltip>
-            </li>
-          </ul>
+          <div className={S.action}>
+            {window.innerWidth > 768 ? (
+              <ul className={S.action} role="list">
+                <li>
+                  <Link href={'usuarios/' + value}>
+                    <Tooltip title="Visualizar">
+                      <IconButton aria-label="visualizar" size="small">
+                        <BsFillEyeFill />
+                      </IconButton>
+                    </Tooltip>
+                  </Link>
+                </li>
+                <li>
+                  <Link href={'usuarios/editar/' + value}>
+                    <Tooltip title="Editar">
+                      <IconButton aria-label="editar" size="small">
+                        <BiSolidEditAlt />
+                      </IconButton>
+                    </Tooltip>
+                  </Link>
+                </li>
+                <li>
+                  <Tooltip title="Remover">
+                    <IconButton
+                      onClick={() => setValue(value)}
+                      aria-label="Deletar"
+                      size="small"
+                    >
+                      <BiSolidTrashAlt />
+                    </IconButton>
+                  </Tooltip>
+                </li>
+              </ul>
+            ) : (
+              <ActionsMenu actions={usuariosActions} />
+            )}
+          </div>
         );
       },
     },
@@ -186,7 +230,7 @@ export default function Home() {
               <StyledLink
                 href="usuarios/cadastrar"
                 data-type="filled"
-                text="Criar Usuario"
+                text={textResponsive}
               />
             </div>
           </div>

@@ -14,6 +14,7 @@ import { MdAttachFile } from 'react-icons/md';
 
 import S from './styles.module.scss';
 
+import ActionsMenu from '@/components/ActionsMenu';
 import Button from '@/components/Button';
 import StyledLink from '@/components/Link';
 import Loader from '@/components/Loader';
@@ -45,6 +46,7 @@ export default function Home() {
   const [token, setToken] = React.useState('');
   const handleClose = () => setValue(0);
   const [infoModalOpen, setInfoModalOpen] = React.useState(false);
+  const [textResponsive, setTextResponsive] = useState('Criar Reunião');
 
   React.useEffect(() => {
     const token = localStorage.getItem('@token');
@@ -52,6 +54,15 @@ export default function Home() {
       redirect('/');
     }
     setToken(token);
+  }, []);
+
+  React.useEffect(() => {
+    const updateText = () => {
+      setTextResponsive(window.innerWidth < 825 ? 'Criar' : 'Criar Reunião');
+    };
+    window.addEventListener('resize', updateText);
+    updateText();
+    return () => window.removeEventListener('resize', updateText);
   }, []);
 
   const handleOpenModal = (id: number, type: string) => {
@@ -87,7 +98,13 @@ export default function Home() {
     },
     {
       header: () => (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           Ações
           <Tooltip title="Clique nos ícones para visualizar, editar ou remover">
             <IconButton
@@ -103,60 +120,94 @@ export default function Home() {
       accessorKey: 'id',
       cell: (info: any) => {
         const value = info.getValue();
+        const reunioesActions = [
+          {
+            icon: <MdAttachFile style={{ marginRight: 8 }} />,
+            text: 'Adicionar Ata',
+            onClick: () => handleOpenModal(value, 'ata'),
+          },
+          {
+            icon: <BiSolidFileImport style={{ marginRight: 8 }} />,
+            text: 'Adicionar Anexos',
+            onClick: () => handleOpenModal(value, 'anexos'),
+          },
+          {
+            icon: <BsFillEyeFill style={{ marginRight: 8 }} />,
+            text: 'Visualizar',
+            href: `reunioes/${value}`,
+          },
+          {
+            icon: <BiSolidEditAlt style={{ marginRight: 8 }} />,
+            text: 'Editar',
+            href: `reunioes/editar/${value}`,
+          },
+          {
+            icon: <BiSolidTrashAlt style={{ marginRight: 8, color: 'red' }} />,
+            text: 'Remover',
+            onClick: () => setValue(value),
+            color: 'red',
+          },
+        ];
         return (
-          <ul className={S.action} role="list">
-            <li>
-              <Tooltip title="Adicionar Ata">
-                <IconButton
-                  onClick={() => handleOpenModal(value, 'ata')}
-                  aria-label="Adicionar ata"
-                  size="small"
-                >
-                  <MdAttachFile />
-                </IconButton>
-              </Tooltip>
-            </li>
-            <li>
-              <Tooltip title="Adicionar Anexos">
-                <IconButton
-                  onClick={() => handleOpenModal(value, 'anexos')}
-                  aria-label="Adicionar anexos"
-                  size="small"
-                >
-                  <BiSolidFileImport />
-                </IconButton>
-              </Tooltip>
-            </li>
-            <li>
-              <Link href={'reunioes/' + value}>
-                <Tooltip title="Visualizar">
-                  <IconButton aria-label="visualizar" size="small">
-                    <BsFillEyeFill />
-                  </IconButton>
-                </Tooltip>
-              </Link>
-            </li>
-            <li>
-              <Link href={'reunioes/editar/' + value}>
-                <Tooltip title="Editar">
-                  <IconButton aria-label="editar" size="small">
-                    <BiSolidEditAlt />
-                  </IconButton>
-                </Tooltip>
-              </Link>
-            </li>
-            <li>
-              <Tooltip title="Remover">
-                <IconButton
-                  onClick={() => setValue(value)}
-                  aria-label="Deletar"
-                  size="small"
-                >
-                  <BiSolidTrashAlt />
-                </IconButton>
-              </Tooltip>
-            </li>
-          </ul>
+          <div className={S.action}>
+            {window.innerWidth > 768 ? (
+              <ul className={S.action} role="list">
+                <li>
+                  <Tooltip title="Adicionar Ata">
+                    <IconButton
+                      onClick={() => handleOpenModal(value, 'ata')}
+                      aria-label="Adicionar ata"
+                      size="small"
+                    >
+                      <MdAttachFile />
+                    </IconButton>
+                  </Tooltip>
+                </li>
+                <li>
+                  <Tooltip title="Adicionar Anexos">
+                    <IconButton
+                      onClick={() => handleOpenModal(value, 'anexos')}
+                      aria-label="Adicionar anexos"
+                      size="small"
+                    >
+                      <BiSolidFileImport />
+                    </IconButton>
+                  </Tooltip>
+                </li>
+                <li>
+                  <Link href={'reunioes/' + value}>
+                    <Tooltip title="Visualizar">
+                      <IconButton aria-label="visualizar" size="small">
+                        <BsFillEyeFill />
+                      </IconButton>
+                    </Tooltip>
+                  </Link>
+                </li>
+                <li>
+                  <Link href={'reunioes/editar/' + value}>
+                    <Tooltip title="Editar">
+                      <IconButton aria-label="editar" size="small">
+                        <BiSolidEditAlt />
+                      </IconButton>
+                    </Tooltip>
+                  </Link>
+                </li>
+                <li>
+                  <Tooltip title="Remover">
+                    <IconButton
+                      onClick={() => setValue(value)}
+                      aria-label="Deletar"
+                      size="small"
+                    >
+                      <BiSolidTrashAlt />
+                    </IconButton>
+                  </Tooltip>
+                </li>
+              </ul>
+            ) : (
+              <ActionsMenu actions={reunioesActions} />
+            )}
+          </div>
         );
       },
     },
@@ -216,7 +267,7 @@ export default function Home() {
               <StyledLink
                 href="reunioes/cadastrar"
                 data-type="filled"
-                text="Criar Reunião"
+                text={textResponsive}
               />
             </div>
           </div>

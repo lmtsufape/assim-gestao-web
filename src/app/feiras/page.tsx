@@ -10,6 +10,7 @@ import { FaStore } from 'react-icons/fa';
 
 import S from './styles.module.scss';
 
+import ActionsMenu from '@/components/ActionsMenu';
 import Button from '@/components/Button';
 import StyledLink from '@/components/Link';
 import Loader from '@/components/Loader';
@@ -47,6 +48,33 @@ export default function Feiras() {
   const [token, setToken] = React.useState('');
   const [infoModalOpen, setInfoModalOpen] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
+  const [textResponsive, setTextResponsive] = React.useState(
+    'Adicionar Nova Feira',
+  );
+  const [textResponsiveHeader, setTextResponsiveHeader] =
+    React.useState('Dia da Semana');
+
+  React.useEffect(() => {
+    const updateText = () => {
+      setTextResponsive(
+        window.innerWidth < 825 ? 'Adicionar' : 'Adicionar Nova Feira',
+      );
+    };
+    window.addEventListener('resize', updateText);
+    updateText();
+    return () => window.removeEventListener('resize', updateText);
+  }, []);
+
+  React.useEffect(() => {
+    const updateTextHeader = () => {
+      setTextResponsiveHeader(
+        window.innerWidth < 821 ? 'Dia' : 'Dia da Semana',
+      );
+    };
+    window.addEventListener('resize', updateTextHeader);
+    updateTextHeader();
+    return () => window.removeEventListener('resize', updateTextHeader);
+  });
 
   React.useEffect(() => {
     const token = localStorage.getItem('@token');
@@ -104,7 +132,7 @@ export default function Feiras() {
       accessorKey: 'nome',
     },
     {
-      header: 'Dia da Semana',
+      header: textResponsiveHeader,
       accessorKey: 'horarios_funcionamento',
       cell: (info: any) => {
         const value = info.getValue();
@@ -117,7 +145,13 @@ export default function Feiras() {
     },
     {
       header: () => (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
           Ações
           <Tooltip title="Clique aqui para informações sobre os ícones">
             <IconButton
@@ -133,47 +167,77 @@ export default function Feiras() {
       accessorKey: 'id',
       cell: (info: any) => {
         const value = info.getValue();
+
+        const feirasActions = [
+          {
+            icon: <BsFillEyeFill style={{ marginRight: 8 }} />,
+            text: 'Ver Detalhes',
+            href: `feiras/${value}`,
+          },
+          {
+            icon: <BiSolidEditAlt style={{ marginRight: 8 }} />,
+            text: 'Editar',
+            href: `feiras/editar/${value}`,
+          },
+          {
+            icon: <FaStore style={{ marginRight: 8 }} />,
+            text: 'Ver Bancas',
+            href: `feiras/${value}/bancas`,
+          },
+          {
+            icon: <BiSolidTrashAlt style={{ marginRight: 8, color: 'red' }} />,
+            text: 'Remover',
+            onClick: () => setValue(value),
+            color: 'red',
+          },
+        ];
         return (
-          <ul className={S.action} role="list">
-            <li>
-              <Link href={`feiras/${value}`}>
-                <Tooltip title="Ver Detalhes">
-                  <IconButton aria-label="detalhes" size="small">
-                    <BsFillEyeFill />
-                  </IconButton>
-                </Tooltip>
-              </Link>
-            </li>
-            <li>
-              <Link href={`feiras/editar/${value}`}>
-                <Tooltip title="Editar">
-                  <IconButton aria-label="editar" size="small">
-                    <BiSolidEditAlt />
-                  </IconButton>
-                </Tooltip>
-              </Link>
-            </li>
-            <li>
-              <Link href={`feiras/${value}/bancas`}>
-                <Tooltip title="Ver Bancas">
-                  <IconButton aria-label="bancas" size="small">
-                    <FaStore />
-                  </IconButton>
-                </Tooltip>
-              </Link>
-            </li>
-            <li>
-              <Tooltip title="Remover">
-                <IconButton
-                  onClick={() => setValue(value)}
-                  aria-label="Deletar"
-                  size="small"
-                >
-                  <BiSolidTrashAlt />
-                </IconButton>
-              </Tooltip>
-            </li>
-          </ul>
+          <div className={S.action}>
+            {window.innerWidth > 768 ? (
+              <ul className={S.action} role="list">
+                <li>
+                  <Link href={`feiras/${value}`}>
+                    <Tooltip title="Ver Detalhes">
+                      <IconButton aria-label="detalhes" size="small">
+                        <BsFillEyeFill />
+                      </IconButton>
+                    </Tooltip>
+                  </Link>
+                </li>
+                <li>
+                  <Link href={`feiras/editar/${value}`}>
+                    <Tooltip title="Editar">
+                      <IconButton aria-label="editar" size="small">
+                        <BiSolidEditAlt />
+                      </IconButton>
+                    </Tooltip>
+                  </Link>
+                </li>
+                <li>
+                  <Link href={`feiras/${value}/bancas`}>
+                    <Tooltip title="Ver Bancas">
+                      <IconButton aria-label="bancas" size="small">
+                        <FaStore />
+                      </IconButton>
+                    </Tooltip>
+                  </Link>
+                </li>
+                <li>
+                  <Tooltip title="Remover">
+                    <IconButton
+                      onClick={() => setValue(value)}
+                      aria-label="Deletar"
+                      size="small"
+                    >
+                      <BiSolidTrashAlt />
+                    </IconButton>
+                  </Tooltip>
+                </li>
+              </ul>
+            ) : (
+              <ActionsMenu actions={feirasActions} />
+            )}
+          </div>
         );
       },
     },
@@ -196,7 +260,7 @@ export default function Feiras() {
               <StyledLink
                 href="feiras/cadastrar"
                 data-type="filled"
-                text="Adicionar Nova Feira"
+                text={textResponsive}
               />
             </div>
           </div>
