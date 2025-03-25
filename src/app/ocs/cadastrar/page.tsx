@@ -2,7 +2,7 @@
 'use client';
 
 import { redirect, useRouter } from 'next/navigation';
-import React from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 
 import S from './styles.module.scss';
@@ -24,29 +24,29 @@ import { Alert, AlertTitle, Snackbar } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 
 export default function Home() {
-  const [name, setName] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [cnpj, setCNPJ] = React.useState('');
-  const [telefone, setTelefone] = React.useState('');
-  const [street, setStreet] = React.useState('');
-  const [cep, setCEP] = React.useState('');
-  const [number, setNumber] = React.useState('');
-  const [complement, setComplement] = React.useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [cnpj, setCNPJ] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [street, setStreet] = useState('');
+  const [cep, setCEP] = useState('');
+  const [number, setNumber] = useState('');
+  const [complement, setComplement] = useState('');
 
-  const [selectedAssociacoes, setSelectedAssociacoes] = React.useState(0);
-  const [selectedAgricultores, setSelectedAgricultores] = React.useState<
+  const [selectedAssociacoes, setSelectedAssociacoes] = useState(0);
+  const [selectedAgricultores, setSelectedAgricultores] = useState<
     string | string[]
   >([]);
 
-  const [bairro, setBairro] = React.useState<Bairro[]>([]);
-  const [selectedBairro, setSelectedBairro] = React.useState(0);
+  const [bairro, setBairro] = useState<Bairro[]>([]);
+  const [selectedBairro, setSelectedBairro] = useState(0);
 
-  const [errorMessages, setErrorMessages] = React.useState<string[]>([]);
-  const [currentError, setCurrentError] = React.useState<string | null>(null);
+  const [errorMessages, setErrorMessages] = useState<string[]>([]);
+  const [currentError, setCurrentError] = useState<string | null>(null);
 
   const router = useRouter();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const token = localStorage.getItem('@token');
     if (!token) {
       redirect('/');
@@ -56,6 +56,38 @@ export default function Home() {
       .then((response: { bairros: Bairro[] }) => setBairro(response.bairros))
       .catch((error: any) => console.log(error));
   }, []);
+
+  const fetchAddress = async (cep: string) => {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+      if (!data.erro) {
+        setStreet(data.logradouro || '');
+        setComplement(data.complemento || '');
+      } else {
+        setCurrentError('CEP não encontrado.');
+      }
+    } catch (error) {
+      console.log(error);
+      setCurrentError('Erro ao buscar o CEP.');
+    }
+  };
+
+  const handleCEPChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const target = e.target as HTMLInputElement;
+    let cepValue = target.value.replace(/\D/g, '');
+
+    if (cepValue.length > 5) {
+      cepValue = cepValue.slice(0, 5) + '-' + cepValue.slice(5, 8);
+    }
+
+    setCEP(cepValue);
+    if (cepValue.replace('-', '').length === 8) {
+      fetchAddress(cepValue.replace('-', ''));
+    }
+  };
 
   const { data: associacoes } = useQuery({
     queryKey: ['associacoes'],
@@ -311,7 +343,7 @@ export default function Home() {
                 type="text"
                 placeholder="Cep"
                 value={cep}
-                onChange={(e) => setCEP(e.target.value)}
+                onChange={handleCEPChange}
                 mask="zipCode"
               />
             </div>

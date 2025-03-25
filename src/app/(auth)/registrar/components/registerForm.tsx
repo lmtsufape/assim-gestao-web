@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import {
   MdManageAccounts,
   MdVisibility,
@@ -66,6 +66,38 @@ const RegisterForm = () => {
       }
     }
   }, [router]);
+
+  const fetchAddress = async (cep: string) => {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+      if (!data.erro) {
+        setStreet(data.logradouro || '');
+        setComplemento(data.complemento || '');
+      } else {
+        setError('CEP não encontrado.');
+      }
+    } catch (error) {
+      console.log(error);
+      setError('Erro ao buscar o CEP.');
+    }
+  };
+
+  const handleCEPChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const target = e.target as HTMLInputElement;
+    let cepValue = target.value.replace(/\D/g, '');
+
+    if (cepValue.length > 5) {
+      cepValue = cepValue.slice(0, 5) + '-' + cepValue.slice(5, 8);
+    }
+
+    setCEP(cepValue);
+    if (cepValue.replace('-', '').length === 8) {
+      fetchAddress(cepValue.replace('-', ''));
+    }
+  };
 
   const fetchCidades = async (token: string) => {
     try {
@@ -226,6 +258,19 @@ const RegisterForm = () => {
         </div>
         <h3>Endereço</h3>
         <div>
+          <label htmlFor="cep">
+            Cep<span>*</span>
+          </label>
+          <Input
+            name="cep"
+            type="text"
+            placeholder="00000-000"
+            value={cep}
+            onChange={handleCEPChange}
+            mask="zipCode"
+          />
+        </div>
+        <div>
           <label htmlFor="cidade-label">
             Cidade<span>*</span>
           </label>
@@ -293,19 +338,6 @@ const RegisterForm = () => {
             placeholder="Rua"
             value={street}
             onChange={(e) => setStreet(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="cep">
-            Cep<span>*</span>
-          </label>
-          <Input
-            name="cep"
-            type="text"
-            placeholder="00000-000"
-            value={cep}
-            onChange={(e) => setCEP(e.target.value)}
-            mask="zipCode"
           />
         </div>
         <div>
