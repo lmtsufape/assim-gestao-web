@@ -1,7 +1,7 @@
 'use client';
 
 import { redirect, useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 
 import S from './styles.module.scss';
 
@@ -35,34 +35,34 @@ import { isValidCPF } from '@/utils/validCpf';
 import Loader from '@/components/Loader';
 
 export default function Home() {
-  const [errorMessages, setErrorMessages] = React.useState<string[]>([]);
-  const [currentError, setCurrentError] = React.useState<string | null>(null);
-  const [confirmationMessage, setConfirmationMessage] = React.useState('');
-  const [loading, setLoading] = React.useState(false);
+  const [errorMessages, setErrorMessages] = useState<string[]>([]);
+  const [currentError, setCurrentError] = useState<string | null>(null);
+  const [confirmationMessage, setConfirmationMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const [name, setName] = React.useState('');
-  const [email, setEmail] = React.useState('');
-  const [cpf, setCpf] = React.useState('');
-  const [telefone, setTelefone] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [selectedCidade, setSelectedCidade] = useState<number>(1);
 
-  const [street, setStreet] = React.useState('');
-  const [cep, setCEP] = React.useState('');
-  const [number, setNumber] = React.useState('');
-  const [complemento, setComplemento] = React.useState('');
+  const [street, setStreet] = useState('');
+  const [cep, setCEP] = useState('');
+  const [number, setNumber] = useState('');
+  const [complemento, setComplemento] = useState('');
 
-  const [bairro, setBairro] = React.useState<Bairro[]>([]);
-  const [selectedBairro, setSelectedBairro] = React.useState<number>(0);
+  const [bairro, setBairro] = useState<Bairro[]>([]);
+  const [selectedBairro, setSelectedBairro] = useState<number>(0);
   const [cidades, setCidades] = useState<Cidade[]>([]);
 
-  const [selectedRole, setSelectedRole] = React.useState<string | string[]>([]);
+  const [selectedRole, setSelectedRole] = useState<string | string[]>([]);
 
   const router = useRouter();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const token = localStorage.getItem('@token');
     fetchCidades(token!);
     fetchBairros(token!, 1);
@@ -70,6 +70,39 @@ export default function Home() {
       redirect('/');
     }
   }, []);
+
+  const fetchAddress = async (cep: string) => {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+      if (!data.erro) {
+        setStreet(data.logradouro || '');
+        setComplemento(data.complemento || '');
+        // Se tiver outros campos como bairro, cidade, estado, adicionar aqui
+      } else {
+        setCurrentError('CEP não encontrado.');
+      }
+    } catch (error) {
+      console.log(error);
+      setCurrentError('Erro ao buscar o CEP.');
+    }
+  };
+
+  const handleCEPChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const target = e.target as HTMLInputElement;
+    let cepValue = target.value.replace(/\D/g, '');
+
+    if (cepValue.length > 5) {
+      cepValue = cepValue.slice(0, 5) + '-' + cepValue.slice(5, 8);
+    }
+
+    setCEP(cepValue);
+    if (cepValue.replace('-', '').length === 8) {
+      fetchAddress(cepValue.replace('-', ''));
+    }
+  };
 
   const fetchCidades = async (token: string) => {
     try {
@@ -360,6 +393,19 @@ export default function Home() {
           <h3>Endereço</h3>
           <section>
             <div>
+              <label htmlFor="cep">
+                Cep<span>*</span>
+              </label>
+              <Input
+                name="cep"
+                type="text"
+                placeholder="00000-000"
+                value={cep}
+                onChange={handleCEPChange}
+                mask="zipCode"
+              />
+            </div>
+            <div>
               <label htmlFor="street">
                 Rua<span>*</span>
               </label>
@@ -369,19 +415,6 @@ export default function Home() {
                 placeholder="Rua"
                 value={street}
                 onChange={(e) => setStreet(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="cep">
-                Cep<span>*</span>
-              </label>
-              <Input
-                name="cep"
-                type="text"
-                placeholder="00000-000"
-                value={cep}
-                onChange={(e) => setCEP(e.target.value)}
-                mask="zipCode"
               />
             </div>
             <div>
