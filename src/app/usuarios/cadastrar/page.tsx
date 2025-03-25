@@ -287,7 +287,6 @@ export default function Home() {
       if (bairros.length > 0) {
         setSelectedBairro(bairros[0].id); // Setar o primeiro bairro como selecionado
       }
-      console.log('Bairros fetched:', bairros);
     } catch (error) {
       console.error('Failed to fetch bairros:', error);
     }
