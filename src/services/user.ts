@@ -9,8 +9,6 @@ export async function checkEmailExistsInUsers(
   token: string,
 ): Promise<boolean> {
   try {
-    console.log(`Token usado para verificar a existência do e-mail: ${token}`);
-
     const response = await api.get(`/api/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -20,17 +18,12 @@ export async function checkEmailExistsInUsers(
 
     if (response.status === 200) {
       const userList = response.data.users;
-      console.log(`Usuários recuperados: ${userList.length}`);
 
       for (const user of userList) {
-        console.log(`Verificando e-mail do usuário: ${user.email}`);
         if (user.email === email) {
-          console.log(`E-mail encontrado no usuário: ${user.email}`);
           return true;
         }
       }
-
-      console.log(`E-mail não encontrado no usuário: ${email}`);
       return false;
     } else {
       console.log(
@@ -51,8 +44,6 @@ export async function checkCpfExistsInUsers(
   token: string,
 ): Promise<boolean> {
   try {
-    console.log(`Token usado para verificar a existência do CPF: ${token}`);
-
     const response = await api.get(`/api/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -62,17 +53,13 @@ export async function checkCpfExistsInUsers(
 
     if (response.status === 200) {
       const userList = response.data.users;
-      console.log(`Usuários recuperados: ${userList.length}`);
 
       for (const user of userList) {
-        console.log(`Verificando CPF do usuário: ${user.cpf}`);
         if (user.cpf === cpf) {
-          console.log(`CPF encontrado no usuário: ${user.cpf}`);
           return true;
         }
       }
 
-      console.log(`CPF não encontrado no usuário: ${cpf}`);
       return false;
     } else {
       console.log(
@@ -154,7 +141,6 @@ export async function createUser(
       },
     });
 
-    console.log('Novo usuário criado:', response.data);
     return response.data;
   } catch (error) {
     console.error('Erro ao criar usuário:', error);
