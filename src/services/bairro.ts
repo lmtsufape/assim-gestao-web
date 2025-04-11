@@ -13,6 +13,7 @@ export async function getAllBairros(
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to fetch bairros');
   }
 }
@@ -55,6 +56,7 @@ export async function deleteBairro(token: string, id: number): Promise<void> {
       },
     });
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to delete bairro');
   }
 }
@@ -71,6 +73,7 @@ export async function createBairro(
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to create bairro');
   }
 }
@@ -88,6 +91,7 @@ export async function updateBairro(
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to update bairro');
   }
 }

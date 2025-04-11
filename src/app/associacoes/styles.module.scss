@@ -17,7 +17,7 @@
   row-gap: 1rem;
   flex-wrap: wrap;
 }
- 
+
 .action {
   display: flex;
   gap: 1rem;
@@ -31,7 +31,7 @@
   place-content: end;
 }
 
-.headerTitle{
+.headerTitle {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -40,23 +40,23 @@
 
 .title {
   color: #005247;
-  font-weight: bold; 
+  font-weight: bold;
   justify-content: center;
   padding: 20px;
 }
 
-.link{
+.link {
   text-decoration: none;
   appearance: none;
-  color:#005247;
+  color: #005247;
 }
 
-.back{
+.back {
   width: 25%;
 }
 
-.addButton{
+.addButton {
   width: 25%;
   display: flex;
-  justify-content: flex-end
+  justify-content: flex-end;
 }

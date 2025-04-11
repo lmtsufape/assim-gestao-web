@@ -1,21 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { redirect, useRouter } from 'next/navigation';
 import React from 'react';
 
 import S from './styles.module.scss';
+
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import MultiSelect from '@/components/Multiselect';
 import { StyledSelect } from '@/components/Multiselect/style';
 import MuiSelect from '@/components/Select';
-import { Select, FormControl, MenuItem } from '@mui/material';
-import { Snackbar, Alert, AlertTitle } from '@mui/material';
-import { TextareaAutosize } from '@mui/material';
 
 import { createReuniao, getAllOCS, getAllUsers } from '@/services';
 import { User } from '@/types/api';
+import { Select, FormControl, MenuItem } from '@mui/material';
+import { Snackbar, Alert, AlertTitle } from '@mui/material';
+import { TextareaAutosize } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 
 export default function Home() {
@@ -103,7 +103,7 @@ export default function Home() {
 
       await createReuniao(requestBody, token);
       router.back();
-    } catch (error: any) {
+    } catch (error) {
       console.log('Error:', error);
       setErrorMessage('Erro ao criar reunião');
       setTimeout(() => {

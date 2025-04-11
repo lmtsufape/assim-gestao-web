@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { redirect, useRouter } from 'next/navigation';
@@ -10,12 +9,13 @@ import Button from '@/components/Button';
 import Input from '@/components/Input';
 import { StyledSelect } from '@/components/Multiselect/style';
 import MuiSelect from '@/components/Select';
-import { Snackbar, Alert, AlertTitle } from '@mui/material';
 
 import { getAllBairros } from '@/services';
 import { createAssociacao } from '@/services/associations';
 import { getPresidents } from '@/services/user';
-import { Bairro } from '@/types/api';
+import { Bairro, GetPresidentsResponse, Presidente } from '@/types/api';
+import { Snackbar, Alert, AlertTitle } from '@mui/material';
+import { AxiosError } from 'axios';
 
 export default function Home() {
   const [name, setName] = useState('');
@@ -30,7 +30,7 @@ export default function Home() {
   const [bairro, setBairro] = useState<Bairro[]>([]);
   const [selectedBairro, setSelectedBairro] = useState(1);
 
-  const [presidents, setPresidents] = useState<[]>([]);
+  const [presidents, setPresidents] = useState<Presidente[]>([]);
   const [selectedPresidents, setSelectedPresidents] = useState(2);
 
   const secretarioId = [3];
@@ -56,11 +56,11 @@ export default function Home() {
     }
 
     getPresidents(token)
-      .then((response: any) => setPresidents(response.users))
-      .catch((error: any) => console.log(error));
+      .then((response: GetPresidentsResponse) => setPresidents(response.users))
+      .catch((error) => console.log(error));
     getAllBairros(token)
       .then((response: { bairros: Bairro[] }) => setBairro(response.bairros))
-      .catch((error: any) => console.log(error));
+      .catch((error) => console.log(error));
   }, []);
 
   const fetchAddress = async (cep: string) => {
@@ -118,9 +118,13 @@ export default function Home() {
         token,
       );
       router.back();
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
-      if (error.response && error.response.status === 500) {
+      if (
+        error instanceof AxiosError &&
+        error.response &&
+        error.response.status === 500
+      ) {
         setTimeout(() => {}, 4000);
       } else {
         setErrorMessage(
@@ -191,7 +195,7 @@ export default function Home() {
               selectedNames={selectedPresidents}
               setSelectedNames={setSelectedPresidents}
             >
-              {presidents?.map((item: { id: number; name: string }) => (
+              {presidents?.map((item: Presidente) => (
                 <StyledSelect
                   key={item.id}
                   value={item.id}

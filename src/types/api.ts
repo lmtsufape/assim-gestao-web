@@ -185,3 +185,20 @@ export interface APIErrorResponse {
     };
   };
 }
+
+export interface FeiraData {
+  nome: string;
+  descricao: string;
+  horarios_funcionamento: {
+    [key: string]: [string, string];
+  };
+  associacao_id: number | null;
+}
+
+export interface GetPresidentsResponse {
+  users: Presidente[];
+}
+
+export interface GetBairrosResponse {
+  bairros: Bairro[];
+}

@@ -1,7 +1,7 @@
 import { api } from './api';
-import { Banca, Feira } from '@/types/api';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Banca, Feira, FeiraData } from '@/types/api';
+import { AxiosError } from 'axios';
 
 export async function getAllFeiras(
   token: string,
@@ -15,6 +15,7 @@ export async function getAllFeiras(
     console.log('Feiras recebidas:', response.data);
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to fetch feiras');
   }
 }
@@ -26,8 +27,12 @@ export async function deleteFeira(token: string, id: number): Promise<void> {
         authorization: `Bearer ${token}`,
       },
     });
-  } catch (error: any) {
-    if (error.response && error.response.status === 400) {
+  } catch (error) {
+    if (
+      error instanceof AxiosError &&
+      error.response &&
+      error.response.status === 400
+    ) {
       throw new Error(error.response.data.error);
     } else {
       throw new Error('Failed to delete feira');
@@ -48,6 +53,7 @@ export async function createFeira(
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to create feira');
   }
 }
@@ -64,6 +70,7 @@ export async function getFeira(
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to fetch feira');
   }
 }
@@ -71,7 +78,7 @@ export async function getFeira(
 export async function updateFeira(
   token: string,
   id: number,
-  feiraData: any,
+  feiraData: FeiraData,
 ): Promise<{ feira: Feira }> {
   try {
     const response = await api.patch(`/api/feiras/${id}`, feiraData, {
@@ -82,6 +89,7 @@ export async function updateFeira(
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to update feira');
   }
 }
@@ -101,6 +109,7 @@ export async function getFeiraImagem(
     const mimeType = response.headers['content-type'];
     return { file: response.data, mimeType };
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to fetch feira image');
   }
 }
@@ -116,6 +125,7 @@ export async function deleteFeiraImagem(
       },
     });
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to delete feira image');
   }
 }
@@ -132,6 +142,7 @@ export async function getBancasByFeira(
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to fetch bancas');
   }
 }

@@ -2,15 +2,16 @@
 
 import { redirect, useRouter } from 'next/navigation';
 import React, { ChangeEvent, useEffect, useState } from 'react';
+import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
 import S from './styles.module.scss';
 
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import Loader from '@/components/Loader';
 import MultiSelect from '@/components/Multiselect';
 import { StyledSelect } from '@/components/Multiselect/style';
 import MuiSelect from '@/components/Select';
-import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
 import {
   createUser,
@@ -19,7 +20,9 @@ import {
   checkEmailExistsInUsers,
   checkCpfExistsInUsers,
 } from '@/services';
+import { getAllCidades } from '@/services/cidades';
 import { Bairro, Cidade } from '@/types/api';
+import { isValidCPF } from '@/utils/validCpf';
 import {
   Alert,
   AlertTitle,
@@ -30,9 +33,7 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import { getAllCidades } from '@/services/cidades';
-import { isValidCPF } from '@/utils/validCpf';
-import Loader from '@/components/Loader';
+import { AxiosError } from 'axios';
 
 export default function Home() {
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
@@ -226,9 +227,7 @@ export default function Home() {
         setConfirmationMessage('');
         router.push('/menu');
       }, 4000);
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+    } catch (error) {
       setLoading(false);
       if (
         error instanceof Error &&
@@ -237,7 +236,7 @@ export default function Home() {
       ) {
         setErrorMessages([error.message]);
         setCurrentError(error.message);
-      } else {
+      } else if (error instanceof AxiosError) {
         const errors = error.response?.data?.errors;
         if (errors !== undefined && errors !== null) {
           const errorList = [];
@@ -426,7 +425,7 @@ export default function Home() {
                   labelId="cidade-label"
                   id="cidade"
                   value={selectedCidade}
-                  placeholder="Cidade"
+                  // placeholder="Cidade"
                   onChange={handleCidadeChange}
                   label="Cidade"
                 >
