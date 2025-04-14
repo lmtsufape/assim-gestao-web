@@ -15,6 +15,8 @@ import { MdAttachFile } from 'react-icons/md';
 import S from './styles.module.scss';
 
 import ActionsMenu from '@/components/ActionsMenu';
+import { AnexosForm } from '@/components/Anexos';
+import { AtaForm } from '@/components/Ata';
 import Button from '@/components/Button';
 import StyledLink from '@/components/Link';
 import Loader from '@/components/Loader';
@@ -23,8 +25,6 @@ import TableView from '@/components/Table/Table';
 import { getAllReunioes, removeReuniao } from '@/services';
 import { Box, IconButton, Tooltip, Modal, Typography } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { AtaForm } from '@/components/Ata';
-import { AnexosForm } from '@/components/Anexos';
 
 const style = {
   position: 'absolute' as const,

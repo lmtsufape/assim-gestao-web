@@ -1,4 +1,5 @@
 import { api } from './api';
+
 import { Estado } from '@/types/api';
 
 export const getAllEstados = async (token: string): Promise<Estado[]> => {

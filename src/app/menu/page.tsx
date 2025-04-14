@@ -1,14 +1,15 @@
 'use client';
 
+import { FC, useEffect, useState } from 'react';
+
 import S from './styles.module.scss';
 
 import MenuOptions from '../../components/Menubuttons';
+import Loader from '@/components/Loader';
 
 import Authentication from '@/utils/session';
-import Loader from '@/components/Loader';
-import { useEffect, useState } from 'react';
 
-const Home = () => {
+const Home: FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

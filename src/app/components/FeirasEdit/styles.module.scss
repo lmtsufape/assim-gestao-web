@@ -2,28 +2,22 @@
   max-width: 1280px;
   padding: 1.5rem 1rem;
   margin: 0 auto;
-}
 
+  h1 {
+    padding-top: 1rem;
+    color: #008000;
+    white-space: nowrap;
+  }
 
-.headerTitle{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 60%;
-  margin-bottom: 10px;
-}
-
-.title {
-  color: #005247;
-  font-weight: bold; 
-  justify-content: center;
-  padding: 20px;
-}
-
-.back{
-  text-decoration: none;
-  appearance: none;
-  color:#005247
+  p {
+    color: #008000;
+    padding-bottom: 2rem;
+    strong {
+      background-color: #deffde;
+      padding: 0.2rem 0.5rem;
+      border-radius: 50px;
+    }
+  }
 }
 
 .wrapperButtons {
@@ -53,7 +47,6 @@
       color: #d23030;
     }
   }
-
   section {
     padding-top: 1rem;
     display: grid;

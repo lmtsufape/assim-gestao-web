@@ -16,9 +16,9 @@ import Loader from '@/components/Loader';
 import TableView from '@/components/Table/Table';
 
 import { getAllCidades, removeCidade } from '@/services/cidades';
+import { Estado } from '@/types/api';
 import { Box, IconButton, Tooltip, Modal, Typography } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Estado } from '@/types/api';
 
 const style = {
   position: 'absolute' as const,

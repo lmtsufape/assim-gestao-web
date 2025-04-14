@@ -1,17 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import Link from 'next/link';
 
 import S from './styles.module.scss';
 
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import MultiSelect from '@/components/Multiselect';
 import { StyledSelect } from '@/components/Multiselect/style';
 import MuiSelect from '@/components/Select';
-import MultiSelect from '@/components/Multiselect';
 
 import {
   createOCS,
@@ -22,6 +21,7 @@ import {
 import { Bairro, User } from '@/types/api';
 import { Alert, AlertTitle, Snackbar } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 
 export default function Home() {
   const [name, setName] = useState('');
@@ -54,7 +54,7 @@ export default function Home() {
 
     getAllBairros(token)
       .then((response: { bairros: Bairro[] }) => setBairro(response.bairros))
-      .catch((error: any) => console.log(error));
+      .catch((error) => console.log(error));
   }, []);
 
   const fetchAddress = async (cep: string) => {
@@ -196,7 +196,7 @@ export default function Home() {
         token,
       );
       router.back();
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       if (
         error instanceof Error &&
@@ -207,7 +207,10 @@ export default function Home() {
         setErrorMessages([error.message]);
         setCurrentError(error.message);
       } else {
-        const errors = error.response?.data?.errors;
+        let errors;
+        if (error instanceof AxiosError && error?.response?.data?.errors) {
+          errors = error.response.data.errors;
+        }
         if (errors !== undefined && errors !== null) {
           const errorList = [];
           for (const key of Object.keys(errors)) {

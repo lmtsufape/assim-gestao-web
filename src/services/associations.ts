@@ -13,6 +13,7 @@ export const getAllAssociacoes = async (
     });
     return response.data.associacoes;
   } catch (error) {
+    console.debug(error);
     throw new Error('Erro ao buscar associações.');
   }
 };
@@ -29,6 +30,7 @@ export async function getAssociacao(
     });
     return response.data.associacao;
   } catch (error) {
+    console.debug(error);
     throw new Error('Erro ao buscar associação.');
   }
 }

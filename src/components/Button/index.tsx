@@ -1,4 +1,5 @@
 import React from 'react';
+
 import S from './styles.module.scss';
 
 type Props = {
@@ -17,7 +18,7 @@ const Button = ({
   style,
   dataType,
   disabled,
-}: Props): JSX.Element => {
+}: Props) => {
   return (
     <button
       onClick={onClick}

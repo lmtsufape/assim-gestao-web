@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import Link from 'next/link';
 import React from 'react';
+import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 
 import S from '../loginForm/styles.module.scss';
 
@@ -10,8 +10,8 @@ import Button from '@/components/Button';
 import Input from '@/components/Input';
 
 import { signIn } from '@/services/user';
-import { MdVisibility, MdVisibilityOff } from 'react-icons/md';
 import { Alert, AlertTitle, Snackbar } from '@mui/material';
+import { AxiosError } from 'axios';
 
 export const LoginForm = () => {
   const [email, setEmail] = React.useState('');
@@ -23,8 +23,11 @@ export const LoginForm = () => {
     e.preventDefault();
     try {
       await signIn(email, password);
-    } catch (error: any) {
-      const errors = error.response?.data?.errors;
+    } catch (error) {
+      let errors;
+      if (error instanceof AxiosError) {
+        errors = error.response?.data?.errors;
+      }
       if (errors !== undefined && errors !== null) {
         /*  const errorMessages = Object.values(errors).map(
           (errArray: any) => errArray[0],
@@ -56,7 +59,7 @@ export const LoginForm = () => {
             name="password"
             type={showPassword ? 'text' : 'password'}
             value={password}
-            onChange={(e: any) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
           />
           <span
             onClick={() => setShowPassword(!showPassword)}

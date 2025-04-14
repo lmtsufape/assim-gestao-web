@@ -1,8 +1,8 @@
-import { isValidCPF } from '@/utils/validCpf';
-import { Role } from '../types/api';
+import { GetPresidentsResponse, Role } from '../types/api';
 import { api } from './api';
 
-import { Presidente, User } from '@/types/api';
+import { User } from '@/types/api';
+import { isValidCPF } from '@/utils/validCpf';
 
 export async function checkEmailExistsInUsers(
   email: string,
@@ -170,7 +170,7 @@ export async function signIn(email: string, password: string) {
 
 export async function getPresidents(
   token: string,
-): Promise<{ data: Presidente[] }> {
+): Promise<GetPresidentsResponse> {
   try {
     const response = await api.get(`/api/users/presidents`, {
       headers: {
@@ -179,6 +179,7 @@ export async function getPresidents(
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to fetch presidents');
   }
 }
@@ -192,6 +193,7 @@ export async function getAllUsers(token: string): Promise<{ users: User[] }> {
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to fetch users');
   }
 }
@@ -208,6 +210,7 @@ export async function getUser(
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to fetch user');
   }
 }
@@ -270,6 +273,7 @@ export async function getAllRoles(token: string): Promise<Role[]> {
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to fetch users');
   }
 }
@@ -279,6 +283,7 @@ export async function sendResetPasswordEmail(email: string) {
     const response = await api.post('api/forgot-password', { email });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to send reset password email');
   }
 }
@@ -298,6 +303,7 @@ export async function resetPassword(
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to reset password');
   }
 }
