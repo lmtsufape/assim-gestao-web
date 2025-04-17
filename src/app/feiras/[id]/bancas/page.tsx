@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { redirect, useSearchParams } from 'next/navigation';
+import { redirect, useParams } from 'next/navigation';
 import React from 'react';
 import { BsFillEyeFill, BsInfoCircle } from 'react-icons/bs';
 
@@ -46,8 +46,16 @@ export default function Bancas() {
   const [infoModalOpen, setInfoModalOpen] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
 
-  const searchParams = useSearchParams();
-  const feiraId = searchParams.get('feiraId');
+  const params = useParams();
+  const feiraId = params.id as string;
+
+  React.useEffect(() => {
+    if (!feiraId) {
+      console.error('feiraId não encontrado nos parâmetros de busca');
+      return;
+    }
+    console.log('Feira ID:', feiraId);
+  }, [feiraId]);
 
   React.useEffect(() => {
     const token = localStorage.getItem('@token');

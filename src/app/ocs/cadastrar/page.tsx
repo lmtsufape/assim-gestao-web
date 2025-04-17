@@ -252,7 +252,7 @@ export default function Home() {
           </div>
         </div>
         <form onSubmit={handleRegister} className={S.form}>
-          <h2>Dados da Associação:</h2>
+          <h2>Dados da Organização:</h2>
           <section>
             <div>
               <label htmlFor="nome">
