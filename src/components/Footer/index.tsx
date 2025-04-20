@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 import { GoMail } from 'react-icons/go';
 import { SiFacebook, SiInstagram } from 'react-icons/si';
@@ -23,10 +24,24 @@ const Footer = () => {
         </li>
         <li className={S.ufapelmtsWrapper}>
           <div className={S.imageContainer}>
-            <Image className={S.ufapeLogo} src={Ufape} alt="ufape logo" />
+            <Link
+              href="https://ufape.edu.br/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'white' }}
+            >
+              <Image className={S.ufapeLogo} src={Ufape} alt="ufape logo" />
+            </Link>
           </div>
           <div className={S.imageContainer}>
-            <Image className={S.lmtsLogo} src={LMTS} alt="lmts logo" />
+            <Link
+              href="http://www.lmts.ufape.edu.br/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'white' }}
+            >
+              <Image className={S.lmtsLogo} src={LMTS} alt="lmts logo" />
+            </Link>
           </div>
         </li>
         <li className={S.socialNetwork}>
