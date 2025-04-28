@@ -12,12 +12,17 @@ import { Banca } from '@/types/api';
 import { getFeira } from '@/services/feiras';
 import { getAgricultor } from '@/services/banca';
 
+interface ParamsType {
+  bancaId: string;
+}
+
 const BancaDetails = ({
-  params,
+  params: paramsPromise,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    params: any;
+  params: Promise<ParamsType>;
 }) => {
+  const params = React.use<ParamsType>(paramsPromise);
+
   const [content, setContent] = React.useState<Banca | null>(null);
   const [feira, setFeira] = React.useState<string>('');
   const [agricultor, setAgricultor] = React.useState<string>('');
@@ -55,7 +60,7 @@ const BancaDetails = ({
     }
 
     fetchData();
-  }, [params.id]);
+  }, [params.bancaId]); // importante acompanhar a dependência correta
 
   if (!content) {
     return <Loader />;
