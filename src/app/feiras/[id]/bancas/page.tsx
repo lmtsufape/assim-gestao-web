@@ -124,7 +124,7 @@ export default function Bancas() {
         return (
           <ul className={S.action} role="list">
             <li>
-              <Link href={`bancas/${value}`}>
+              <Link href={`/feiras/${feiraId}/bancas/${value}`}>
                 <Tooltip title="Visualizar Detalhes">
                   <IconButton aria-label="detalhes" size="small">
                     <BsFillEyeFill />
