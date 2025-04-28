@@ -1,8 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React from 'react';
+
 import S from './styles.module.scss';
+
 import Button from '@/components/Button';
+
+import Search from '../Search';
 
 import {
   useReactTable,
@@ -11,17 +16,14 @@ import {
   getPaginationRowModel,
   getFilteredRowModel,
 } from '@tanstack/react-table';
-import Search from '../Search';
 
 type Column = {
   header: (() => React.ReactNode) | string;
   accessorKey: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  cell?: (info: any) => JSX.Element;
+  cell?: (info: any) => React.ReactNode;
 };
 
 type TableViewProps = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
   columns: Column[];
 };

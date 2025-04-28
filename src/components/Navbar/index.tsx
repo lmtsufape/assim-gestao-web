@@ -7,7 +7,6 @@ import * as React from 'react';
 import styles from './styles.module.scss';
 
 import { Icons } from '@/assets';
-
 import {
   AppBar,
   Box,

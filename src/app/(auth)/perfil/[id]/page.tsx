@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { BiSolidEditAlt } from 'react-icons/bi';
 
@@ -11,7 +11,6 @@ import Loader from '@/components/Loader';
 
 import { getUser } from '@/services';
 import { User } from '@/types/api';
-import Link from 'next/link';
 
 const ProfilePage = () => {
   const [content, setContent] = useState<User | null>(null);
@@ -25,8 +24,8 @@ const ProfilePage = () => {
     }
     if (typeof userId === 'string') {
       getUser(token, userId)
-        .then((response: any) => setContent(response.user))
-        .catch((error: any) => console.log(error));
+        .then((response) => setContent(response.user))
+        .catch((error) => console.log(error));
     }
   }, [userId]);
 

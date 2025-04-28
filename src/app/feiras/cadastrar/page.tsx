@@ -1,11 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React, { useState, FormEvent, useEffect } from 'react';
 import { redirect, useRouter } from 'next/navigation';
+import React, { useState, FormEvent, useEffect } from 'react';
+
 import S from './styles.module.scss';
+
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import { StyledSelect } from '@/components/Multiselect/style';
+import MuiSelect from '@/components/Select';
+
+import { getAllAssociacoes, getAllBairros } from '@/services';
+import { createFeira } from '@/services/feiras';
+import { Bairro } from '@/types/api';
 import {
   Snackbar,
   Alert,
@@ -20,12 +27,7 @@ import {
   TextField,
   SelectChangeEvent,
 } from '@mui/material';
-import { getAllAssociacoes, getAllBairros } from '@/services';
-import { createFeira } from '@/services/feiras';
-import { Bairro } from '@/types/api';
 import { useQuery } from '@tanstack/react-query';
-import MuiSelect from '@/components/Select';
-import { StyledSelect } from '@/components/Multiselect/style';
 
 const diasDaSemana = [
   'domingo',
@@ -81,7 +83,7 @@ export default function CreateFeira() {
 
     getAllBairros(token)
       .then((response: { bairros: Bairro[] }) => setBairros(response.bairros))
-      .catch((error: any) => console.log(error));
+      .catch((error) => console.log(error));
   }, []);
 
   const handleSubmit = async (e: FormEvent) => {

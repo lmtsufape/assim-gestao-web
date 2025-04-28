@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { redirect, useRouter } from 'next/navigation';
@@ -10,11 +9,12 @@ import Button from '@/components/Button';
 import Input from '@/components/Input';
 import { StyledSelect } from '@/components/Multiselect/style';
 import MuiSelect from '@/components/Select';
-import { Snackbar, Alert, AlertTitle } from '@mui/material';
 
-import { getAllEstados } from '@/services/estado';
 import { createCidade } from '@/services/cidades';
+import { getAllEstados } from '@/services/estado';
 import { Estado } from '@/types/api';
+import { Snackbar, Alert, AlertTitle } from '@mui/material';
+import { AxiosError } from 'axios';
 
 export default function Home() {
   const [name, setName] = React.useState('');
@@ -44,8 +44,8 @@ export default function Home() {
     }
 
     getAllEstados(token)
-      .then((response: any) => setEstado(response))
-      .catch((error: any) => console.log(error));
+      .then((response) => setEstado(response))
+      .catch((error) => console.log(error));
   }, []);
 
   const handleRegister: (e: React.FormEvent) => Promise<void> = async (e) => {
@@ -62,9 +62,13 @@ export default function Home() {
 
       await createCidade(token, cidadeData);
       router.back();
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
-      if (error.response && error.response.status === 500) {
+      if (
+        error instanceof AxiosError &&
+        error.response &&
+        error.response.status === 500
+      ) {
         setTimeout(() => {}, 4000);
       } else {
         setErrorMessage(

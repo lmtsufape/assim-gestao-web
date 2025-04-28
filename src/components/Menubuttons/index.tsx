@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import React from 'react';
+import { BiSolidHome } from 'react-icons/bi';
 import { FaBuildingUser, FaCity } from 'react-icons/fa6';
 import { GrSchedules } from 'react-icons/gr';
 import { HiUsers } from 'react-icons/hi';
-import { TbHomeSearch } from 'react-icons/tb';
 import { PiStorefrontLight } from 'react-icons/pi';
+import { TbHomeSearch } from 'react-icons/tb';
 
 import S from './styles.module.scss';
-import { BiSolidHome } from 'react-icons/bi';
 
 const MenuOptions = () => {
   const [role, setRole] = React.useState('');
@@ -23,7 +23,7 @@ const MenuOptions = () => {
   }, []);
 
   const menuOptions: Array<{
-    icon: JSX.Element;
+    icon: React.ReactNode;
     name: string;
     route: string;
     roles: string[];

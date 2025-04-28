@@ -1,6 +1,6 @@
 import { api } from './api';
-import { OCS } from '@/types/api';
-import { User } from '@/types/api';
+
+import { OCS, User } from '@/types/api';
 import { isValidCNPJ } from '@/utils/validCnpj';
 
 export async function getAllOCS(token: string): Promise<{ ocs: OCS[] }> {
@@ -12,6 +12,7 @@ export async function getAllOCS(token: string): Promise<{ ocs: OCS[] }> {
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to fetch ocs');
   }
 }
@@ -25,6 +26,7 @@ export async function getOCS(token: string, id: string): Promise<{ ocs: OCS }> {
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to fetch ocs');
   }
 }
@@ -41,6 +43,7 @@ export async function getUsersByOCS(
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to fetch users by ocs');
   }
 }
@@ -289,6 +292,7 @@ export async function editOCS(
     console.log(response.data);
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to edit ocs');
   }
 }
@@ -302,6 +306,7 @@ export async function removeOCS(token: string, id: number) {
     });
     return response.data;
   } catch (error) {
+    console.debug(error);
     throw new Error('Failed to remove ocs');
   }
 }

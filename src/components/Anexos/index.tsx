@@ -48,6 +48,7 @@ export const AnexosForm = ({ reuniaoId }: { reuniaoId: number }) => {
       setIsLoading(false);
       setErrorMessage('');
     } catch (error) {
+      console.debug(error);
       setIsLoading(false);
       setErrorMessage('Ocorreu um erro ao enviar os anexos.');
     }

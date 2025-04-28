@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import Link from 'next/link';
@@ -16,9 +15,10 @@ import Button from '@/components/Button';
 import Input from '@/components/Input';
 import StyledLink from '@/components/Link';
 
-import { createUser } from '@/services/user';
+import { getAllBairrosByCidade } from '@/services';
 import { getAllCidades } from '@/services/cidades';
-
+import { createUser } from '@/services/user';
+import { Bairro, Cidade } from '@/types/api';
 import {
   Alert,
   AlertTitle,
@@ -29,8 +29,7 @@ import {
   SelectChangeEvent,
   FormHelperText,
 } from '@mui/material';
-import { Bairro, Cidade } from '@/types/api';
-import { getAllBairrosByCidade } from '@/services';
+import { AxiosError } from 'axios';
 
 const RegisterForm = () => {
   const [name, setName] = useState('');
@@ -161,14 +160,32 @@ const RegisterForm = () => {
         token!,
       );
       router.back();
-    } catch (error: any) {
-      console.log(error.response?.data?.message);
-      const errors = error.response?.data?.errors;
-      if (errors !== undefined && errors !== null) {
-        for (const key of Object.keys(errors)) {
-          const errorMessage = errors[key][0];
-          setError(`${errorMessage}`);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.log(error.response?.data?.message);
+        const errors = error.response?.data?.errors;
+        if (errors !== undefined && errors !== null) {
+          for (const key of Object.keys(errors)) {
+            const errorMessage = errors[key][0];
+            setError(`${errorMessage}`);
+          }
         }
+      } else if (error instanceof Error) {
+        console.log(
+          `[registerForm] Erro genérico: ${JSON.stringify(
+            error?.message,
+          )} | ${typeof error}`,
+        );
+        setError(
+          `Erro genérico ao cadastrar: ${JSON.stringify(error?.message)}`,
+        );
+      } else {
+        console.log(
+          `[registerForm] Erro desconhecido: ${JSON.stringify(
+            error,
+          )} | ${typeof error}`,
+        );
+        setError(`Erro desconhecido ao cadastrar: ${JSON.stringify(error)}`);
       }
     }
   };
@@ -280,7 +297,7 @@ const RegisterForm = () => {
               labelId="cidade-label"
               id="cidade"
               value={selectedCidade}
-              placeholder="Cidade"
+              // placeholder="Cidade"
               onChange={handleCidadeChange}
               label="Cidade"
             >

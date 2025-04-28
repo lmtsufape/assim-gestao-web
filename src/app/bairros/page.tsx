@@ -15,10 +15,10 @@ import StyledLink from '@/components/Link';
 import Loader from '@/components/Loader';
 import TableView from '@/components/Table/Table';
 
+import { deleteBairro, getAllBairros } from '@/services';
+import { Cidade } from '@/types/api';
 import { Box, IconButton, Tooltip, Modal, Typography } from '@mui/material';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Cidade } from '@/types/api';
-import { deleteBairro, getAllBairros } from '@/services';
 
 const style = {
   position: 'absolute' as const,
