@@ -84,7 +84,7 @@ export async function updateBairro(
   bairro: Partial<Bairro>,
 ): Promise<{ bairro: Bairro }> {
   try {
-    const response = await api.put(`/api/bairros/${id}`, bairro, {
+    const response = await api.patch(`/api/bairros/${id}`, bairro, {
       headers: {
         authorization: `Bearer ${token}`,
       },

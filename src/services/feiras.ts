@@ -134,12 +134,15 @@ export async function getBancasByFeira(
   token: string,
   feiraId: number,
 ): Promise<{ bancas: Banca[] }> {
+  console.log('Chamando getBancasByFeira');
+
   try {
     const response = await api.get(`/api/feiras/${feiraId}/bancas`, {
       headers: {
         authorization: `Bearer ${token}`,
       },
     });
+    console.log('Response data:', response.data);
     return response.data;
   } catch (error) {
     console.debug(error);
