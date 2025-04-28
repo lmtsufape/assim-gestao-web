@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { redirect, useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import React from 'react';
 
 import S from './styles.module.scss';
@@ -15,12 +15,12 @@ import { getAgricultor } from '@/services/banca';
 const BancaDetails = ({
   params,
 }: {
-  params: { id: string; bancaId: string };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    params: any;
 }) => {
   const [content, setContent] = React.useState<Banca | null>(null);
   const [feira, setFeira] = React.useState<string>('');
   const [agricultor, setAgricultor] = React.useState<string>('');
-  const router = useRouter();
 
   React.useEffect(() => {
     const token = localStorage.getItem('@token');
