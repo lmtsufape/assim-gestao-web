@@ -184,7 +184,7 @@ export default function Home() {
               <Input
                 name="date"
                 type="text"
-                placeholder="DD-MM-AAAA"
+                placeholder="dd/mm/aaaa"
                 value={date}
                 mask="date"
                 onChange={(e) => setDate(e.target.value)}
