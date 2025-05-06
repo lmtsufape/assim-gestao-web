@@ -208,7 +208,11 @@ const UsuariosEditHome = ({ id }: UsuariosEditHomeProps) => {
                   value={item.nome}
                   sx={{ justifyContent: 'space-between' }}
                 >
-                  {item.nome}
+                  {item.nome === 'agricultor' 
+                   ? 'vendedor' 
+                   : item.nome === 'secretario' 
+                   ? 'secretário' 
+                   : item.nome}
                 </StyledSelect>
               ))}
             </MultiSelect>
