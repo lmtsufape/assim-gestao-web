@@ -150,7 +150,7 @@ const RegisterForm = () => {
           apelido: null,
           telefone,
           cpf,
-          roles: [4],
+          roles: [5],
           rua: street,
           cep,
           numero: number,
