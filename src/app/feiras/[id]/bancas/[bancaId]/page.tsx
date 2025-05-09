@@ -5,12 +5,13 @@ import { redirect } from 'next/navigation';
 import React from 'react';
 
 import S from './styles.module.scss';
+
 import Loader from '@/components/Loader';
 
 import { getBanca } from '@/services/banca';
-import { Banca } from '@/types/api';
-import { getFeira } from '@/services/feiras';
 import { getAgricultor } from '@/services/banca';
+import { getFeira } from '@/services/feiras';
+import { Banca } from '@/types/api';
 
 interface ParamsType {
   bancaId: string;

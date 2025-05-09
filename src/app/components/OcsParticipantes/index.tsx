@@ -83,9 +83,8 @@ const OCSParticipantesHome = ({ id }: OCSParticipantesHomeProps) => {
   }, [id]);
 
   function responseUsersFilter(response: { users: User[] }) {
-    return response.users.filter(
-      /* eslint-disable-next-line prettier/prettier */
-      (user) => user.roles?.some((role: any) => role.nome === 'agricultor'),
+    return response.users.filter((user) =>
+      user.roles?.some((role: any) => role.nome === 'agricultor'),
     );
   }
 
