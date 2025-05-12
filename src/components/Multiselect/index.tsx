@@ -45,7 +45,13 @@ export default function MultiSelect({
               selected.map((value) => (
                 <Chip
                   key={value}
-                  label={value === 'agricultor' ? 'vendedor' : value}
+                  label={
+                    value === 'agricultor'
+                      ? 'vendedor'
+                      : value === 'secretario'
+                        ? 'secretário'
+                        : value
+                  }
                 />
               ))}
           </Box>
