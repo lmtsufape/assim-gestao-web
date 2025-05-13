@@ -76,10 +76,43 @@ export default function Home() {
     try {
       const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
       const data = await response.json();
+
       if (!data.erro) {
         setStreet(data.logradouro || '');
         setComplemento(data.complemento || '');
-        // Se tiver outros campos como bairro, cidade, estado, adicionar aqui
+
+        const cidadeViaCep = data.localidade?.toLowerCase().trim();
+        const bairroViaCep = data.bairro?.toLowerCase().trim();
+
+        const cidadeMatch = cidades.find(
+          (cidade) => cidade.nome.toLowerCase().trim() === cidadeViaCep,
+        );
+
+        if (cidadeMatch) {
+          setSelectedCidade(cidadeMatch.id as number);
+          const token = localStorage.getItem('@token');
+
+          const { bairros } = await getAllBairrosByCidade(
+            token!,
+            cidadeMatch.id as number,
+          );
+          setBairro(bairros);
+
+          const bairroMatch = bairros.find(
+            (bairro) => bairro.nome.toLowerCase().trim() === bairroViaCep,
+          );
+
+          if (bairroMatch) {
+            setSelectedBairro(bairroMatch.id);
+          } else {
+            setSelectedBairro(bairros[0]?.id || 0);
+            console.warn('Bairro não encontrado nos dados cadastrados.');
+          }
+        } else {
+          setSelectedCidade(1);
+          setSelectedBairro(0);
+          console.warn('Cidade não encontrada nos dados cadastrados.');
+        }
       } else {
         setCurrentError('CEP não encontrado.');
       }

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { redirect, useParams } from 'next/navigation';
 import React from 'react';
 
 import S from './styles.module.scss';
@@ -13,17 +13,9 @@ import { getAgricultor } from '@/services/banca';
 import { getFeira } from '@/services/feiras';
 import { Banca } from '@/types/api';
 
-interface ParamsType {
-  bancaId: string;
-}
-
-const BancaDetails = ({
-  params: paramsPromise,
-}: {
-  params: Promise<ParamsType>;
-}) => {
-  const params = React.use<ParamsType>(paramsPromise);
-
+const BancaDetails = () => {
+  const params = useParams();
+  const bancaId = params.bancaId as string;
   const [content, setContent] = React.useState<Banca | null>(null);
   const [feira, setFeira] = React.useState<string>('');
   const [agricultor, setAgricultor] = React.useState<string>('');
@@ -40,7 +32,7 @@ const BancaDetails = ({
         redirect('/');
       }
       try {
-        const bancaResponse = await getBanca(token, parseInt(params.bancaId));
+        const bancaResponse = await getBanca(token, parseInt(bancaId));
         setContent(bancaResponse);
 
         if (bancaResponse.feira_id) {
@@ -61,7 +53,7 @@ const BancaDetails = ({
     }
 
     fetchData();
-  }, [params.bancaId]); // importante acompanhar a dependência correta
+  }, [bancaId]);
 
   if (!content) {
     return <Loader />;

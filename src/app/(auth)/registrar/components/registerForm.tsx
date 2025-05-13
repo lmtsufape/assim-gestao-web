@@ -70,9 +70,44 @@ const RegisterForm = () => {
     try {
       const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
       const data = await response.json();
+
       if (!data.erro) {
         setStreet(data.logradouro || '');
         setComplemento(data.complemento || '');
+
+        const cidadeViaCep = data.localidade?.toLowerCase().trim();
+        const bairroViaCep = data.bairro?.toLowerCase().trim();
+
+        const cidadeMatch = cidades.find(
+          (cidade) => cidade.nome.toLowerCase().trim() === cidadeViaCep,
+        );
+
+        if (cidadeMatch) {
+          setSelectedCidade(cidadeMatch.id as number);
+          const token = localStorage.getItem('@token');
+
+          const { bairros } = await getAllBairrosByCidade(
+            token!,
+            cidadeMatch.id as number,
+          );
+          setBairros(bairros);
+
+          const bairroMatch = bairros.find(
+            (bairro) => bairro.nome.toLowerCase().trim() === bairroViaCep,
+          );
+
+          if (bairroMatch) {
+            setSelectedBairro(bairroMatch.id);
+            setBairroError(false);
+          } else {
+            setSelectedBairro('');
+            console.warn('Bairro não encontrado nos dados cadastrados.');
+          }
+        } else {
+          setSelectedCidade(1);
+          setSelectedBairro('');
+          console.warn('Cidade não encontrada nos dados cadastrados.');
+        }
       } else {
         setError('CEP não encontrado.');
       }
@@ -150,7 +185,7 @@ const RegisterForm = () => {
           apelido: null,
           telefone,
           cpf,
-          roles: [4],
+          roles: [5],
           rua: street,
           cep,
           numero: number,
@@ -297,7 +332,6 @@ const RegisterForm = () => {
               labelId="cidade-label"
               id="cidade"
               value={selectedCidade}
-              // placeholder="Cidade"
               onChange={handleCidadeChange}
               label="Cidade"
             >
