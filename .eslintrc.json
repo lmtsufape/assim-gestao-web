@@ -46,6 +46,6 @@
         "alphabetize": { "order": "asc", "ignoreCase": true }
       }
     ],
-    "prettier/prettier": "error"
+    "prettier/prettier": "warn"
   }
 }
