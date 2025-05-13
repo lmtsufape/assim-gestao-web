@@ -61,9 +61,29 @@ export default function Home() {
     try {
       const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
       const data = await response.json();
+
       if (!data.erro) {
         setStreet(data.logradouro || '');
         setComplement(data.complemento || '');
+
+        const bairroViaCep = data.bairro?.toLowerCase().trim();
+
+        if (bairroViaCep && bairro.length > 0) {
+          // Busca o bairro pelo nome (case insensitive)
+          const bairroMatch = bairro.find(
+            (b) => b.nome.toLowerCase().trim() === bairroViaCep,
+          );
+
+          if (bairroMatch) {
+            setSelectedBairro(bairroMatch.id);
+          } else {
+            console.warn(
+              'Bairro do CEP não encontrado em nosso cadastro:',
+              bairroViaCep,
+            );
+            setCurrentError('Bairro do CEP não encontrado em nosso cadastro.');
+          }
+        }
       } else {
         setCurrentError('CEP não encontrado.');
       }
