@@ -11,7 +11,7 @@
     display: flex;
     justify-content: space-between;
     margin: 0 auto;
-    place-items: center;
+    align-items: center;
     list-style: none;
     width: 90%;
   }
@@ -53,12 +53,19 @@
 .socialNetwork {
   display: flex;
   gap: 1.5rem;
-  place-items: center;
+  align-items: center;
   height: fit-content;
 
-  .email {
+  svg {
     font-size: 20px;
   }
+}
+
+.socialNetwork Link {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (max-width: 500px) {

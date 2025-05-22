@@ -158,7 +158,10 @@ export default function Home() {
 
   const validateFields = () => {
     const errors = {
-      name: name.length >= 10 ? '' : 'Nome deve ter pelo menos 10 caracteres.',
+      name:
+        name.trim().length >= 10
+          ? ''
+          : 'Nome deve ter pelo menos 10 caracteres.',
       email: email ? '' : 'E-mail é obrigatório.',
       cnpj: cnpj ? '' : 'CNPJ é obrigatório.',
       telefone: telefone ? '' : 'Telefone é obrigatório.',
