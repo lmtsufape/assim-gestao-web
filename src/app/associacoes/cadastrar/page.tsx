@@ -111,8 +111,22 @@ export default function Home() {
     }
   };
 
+  function convertDateToISO(dateStr: string): string {
+    const [day, month, year] = dateStr.split('-');
+    return `${year}-${month}-${day}`;
+  }
+
   const handleRegister: (e: React.FormEvent) => Promise<void> = async (e) => {
     e.preventDefault();
+    if (name.trim().length < 10) {
+      setErrorMessage('Nome deve ter pelo menos 10 caracteres.');
+      return;
+    }
+
+    if (!date || !cep || !street || !number) {
+      setErrorMessage('Preencha todos os campos obrigatórios.');
+      return;
+    }
     try {
       const token = localStorage.getItem('@token');
       if (!token) {
@@ -123,7 +137,7 @@ export default function Home() {
           nome: name,
           email: email,
           telefone: telefone,
-          data_fundacao: date,
+          data_fundacao: convertDateToISO(date),
           rua: street,
           cep: cep,
           numero: number,

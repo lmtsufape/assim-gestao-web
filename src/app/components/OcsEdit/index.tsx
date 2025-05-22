@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
 import S from './styles.module.scss';
 
@@ -138,6 +138,54 @@ const OcsEditHome = ({ id }: OcsEditHomeProps) => {
       }
     });
     return selectedAgricultoresIds;
+  };
+
+  const fetchAddress = async (cep: string) => {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        setStreet(data.logradouro || '');
+        setComplement(data.complemento || '');
+
+        const bairroViaCep = data.bairro?.toLowerCase().trim();
+
+        if (bairroViaCep && bairro.length > 0) {
+          const bairroMatch = bairro.find(
+            (b) => b.nome.toLowerCase().trim() === bairroViaCep,
+          );
+
+          if (bairroMatch) {
+            setSelectedBairro(bairroMatch.id);
+          } else {
+            console.warn('Bairro não encontrado nos dados cadastrados.');
+            setError('Bairro do CEP não encontrado em nosso cadastro.');
+          }
+        }
+      } else {
+        setError('CEP não encontrado.');
+      }
+    } catch (error) {
+      console.log(error);
+      setError('Erro ao buscar o CEP.');
+    }
+  };
+
+  const handleCEPChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const target = e.target as HTMLInputElement;
+    let cepValue = target.value.replace(/\D/g, '');
+
+    if (cepValue.length > 5) {
+      cepValue = cepValue.slice(0, 5) + '-' + cepValue.slice(5, 8);
+    }
+
+    setCEP(cepValue);
+    if (cepValue.replace('-', '').length === 8) {
+      fetchAddress(cepValue.replace('-', ''));
+    }
   };
 
   const handleEditRegister = async (e: React.FormEvent) => {
@@ -293,18 +341,6 @@ const OcsEditHome = ({ id }: OcsEditHomeProps) => {
           <h3>Endereço</h3>
           <section>
             <div>
-              <label htmlFor="street">
-                Rua<span>*</span>
-              </label>
-              <Input
-                name="street"
-                type="text"
-                placeholder={content.endereco?.rua ?? ''}
-                value={street}
-                onChange={(e) => setStreet(e.target.value)}
-              />
-            </div>
-            <div>
               <label htmlFor="cep">
                 Cep<span>*</span>
               </label>
@@ -313,7 +349,7 @@ const OcsEditHome = ({ id }: OcsEditHomeProps) => {
                 type="text"
                 placeholder={content.endereco?.cep ?? ''}
                 value={cep}
-                onChange={(e) => setCEP(e.target.value)}
+                onChange={handleCEPChange}
                 mask="zipCode"
               />
             </div>
@@ -332,6 +368,18 @@ const OcsEditHome = ({ id }: OcsEditHomeProps) => {
                 </StyledSelect>
               ))}
             </MuiSelect>
+            <div>
+              <label htmlFor="street">
+                Rua<span>*</span>
+              </label>
+              <Input
+                name="street"
+                type="text"
+                placeholder={content.endereco?.rua ?? ''}
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+              />
+            </div>
             <div>
               <label htmlFor="number">
                 Número<span>*</span>

@@ -1,7 +1,7 @@
 'use client';
 
 import { redirect, useRouter } from 'next/navigation';
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
 import S from './styles.module.scss';
 
@@ -71,12 +71,18 @@ const AssociacaoEditHome = ({ id }: AssociacaoEditHomeProps) => {
       .catch((error) => console.log(error));
   }, [id]);
 
+  function formatDateToInput(dateString: string | undefined): string {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  }
+
   React.useEffect(() => {
     if (content) {
       setName(content.nome ?? '');
       setEmail(content.contato?.email ?? '');
       setPhone(content.contato?.telefone ?? '');
-      setDate(content.data_fundacao ?? '');
+      setDate(formatDateToInput(content.data_fundacao));
       setStreet(content.endereco?.rua ?? '');
       setCEP(content.endereco?.cep ?? '');
       setNumber(content.endereco?.numero ?? '');
@@ -98,6 +104,59 @@ const AssociacaoEditHome = ({ id }: AssociacaoEditHomeProps) => {
     (item: Presidente) => item.id,
   );
 
+  const fetchAddress = async (cep: string) => {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        setStreet(data.logradouro || '');
+        setComplement(data.complemento || '');
+
+        const bairroViaCep = data.bairro?.toLowerCase().trim();
+
+        if (bairroViaCep && bairro.length > 0) {
+          const bairroMatch = bairro.find(
+            (b) => b.nome.toLowerCase().trim() === bairroViaCep,
+          );
+
+          if (bairroMatch) {
+            setSelectedBairro(bairroMatch.id);
+          } else {
+            console.warn('Bairro não encontrado nos dados cadastrados.');
+            setError('Bairro do CEP não encontrado em nosso cadastro.');
+          }
+        }
+      } else {
+        setError('CEP não encontrado.');
+      }
+    } catch (error) {
+      console.log(error);
+      setError('Erro ao buscar o CEP.');
+    }
+  };
+
+  function convertDateToISO(dateStr: string): string {
+    const [day, month, year] = dateStr.split('-');
+    return `${year}-${month}-${day}`;
+  }
+
+  const handleCEPChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const target = e.target as HTMLInputElement;
+    let cepValue = target.value.replace(/\D/g, '');
+
+    if (cepValue.length > 5) {
+      cepValue = cepValue.slice(0, 5) + '-' + cepValue.slice(5, 8);
+    }
+
+    setCEP(cepValue);
+    if (cepValue.replace('-', '').length === 8) {
+      fetchAddress(cepValue.replace('-', ''));
+    }
+  };
+
   const handleEditRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -110,7 +169,7 @@ const AssociacaoEditHome = ({ id }: AssociacaoEditHomeProps) => {
         nome: name || (content.nome ?? ''),
         email: email || (content?.contato?.email ?? ''),
         telefone: phone || (content?.contato?.telefone ?? ''),
-        data_fundacao: date || (content?.data_fundacao ?? ''),
+        data_fundacao: convertDateToISO(date) || (content?.data_fundacao ?? ''),
         rua: street || (content?.endereco?.rua ?? ''),
         cep: cep || (content?.endereco?.cep ?? ''),
         numero: number || (content?.endereco?.numero ?? ''),
@@ -224,18 +283,6 @@ const AssociacaoEditHome = ({ id }: AssociacaoEditHomeProps) => {
           <h3>Endereço</h3>
           <section>
             <div>
-              <label htmlFor="street">
-                Rua<span>*</span>
-              </label>
-              <Input
-                name="street"
-                type="text"
-                placeholder={content.endereco?.rua ?? ''}
-                value={street}
-                onChange={(e) => setStreet(e.target.value)}
-              />
-            </div>
-            <div>
               <label htmlFor="cep">
                 Cep<span>*</span>
               </label>
@@ -244,7 +291,7 @@ const AssociacaoEditHome = ({ id }: AssociacaoEditHomeProps) => {
                 type="text"
                 placeholder={content.endereco?.cep ?? ''}
                 value={cep}
-                onChange={(e) => setCEP(e.target.value)}
+                onChange={handleCEPChange}
                 mask="zipCode"
               />
             </div>
@@ -263,6 +310,18 @@ const AssociacaoEditHome = ({ id }: AssociacaoEditHomeProps) => {
                 </StyledSelect>
               ))}
             </MuiSelect>
+            <div>
+              <label htmlFor="street">
+                Rua<span>*</span>
+              </label>
+              <Input
+                name="street"
+                type="text"
+                placeholder={content.endereco?.rua ?? ''}
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+              />
+            </div>
             <div>
               <label htmlFor="number">
                 Número<span>*</span>
